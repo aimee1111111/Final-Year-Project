@@ -1,0 +1,58 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.logout-container {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn {
+    text-decoration: none;
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.btn.yes {
+    background-color: #ff4d4d;
+}
+
+.btn.yes:hover {
+    background-color: #ff1a1a;
+    transform: scale(1.1);
+}
+
+.btn.no {
+    background-color: #4CAF50;
+}
+
+.btn.no:hover {
+    background-color: #2e8b57;
+    transform: scale(1.1);
+}

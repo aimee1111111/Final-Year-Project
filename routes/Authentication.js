@@ -1,55 +1,65 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const path = require('path');
-const pool = require('../db');
-
+const pool = require('../databaseConnection');
 const router = express.Router();
 
-// Serve signup page
-router.get('/signup', (req, res) => {
-    res.sendFile(path.join(__dirname, '../WebPages/signup.html'));
-});
-
-// Handle signup
 router.post('/signup', async (req, res) => {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) return res.status(400).send('All fields required.');
-
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        //checks if user exists
-        const existingUser = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
-        if (existingUser.rows.length > 0) return res.status(400).send('Email exists.');
-
-        //enters new user into the users table
-        await pool.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)', [username, email, hashedPassword]);
-        res.redirect('/Home.html');
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error signing up.');
+  try {
+    const { username, email, password } = req.body || {};
+    if (!username || !email || !password) {
+      return res.status(400).json({ success: false, error: 'All fields required.' });
     }
+
+    const emailNorm = String(email).trim().toLowerCase();
+    const usernameNorm = String(username).trim();
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await pool.query(
+      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
+      [usernameNorm, emailNorm, hashedPassword]
+    );
+
+    return res.status(201).json({ success: true, redirectUrl: '/Home.html' });
+  } catch (err) {
+    console.error('[SIGNUP] error:', err);
+    return res.status(500).json({ success: false, error: 'Error signing up. Please try again.' });
+  }
 });
 
-// Handle login
+
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).send('All fields required.');
+  const { email, password } = req.body || {};
+  if (!email || !password) {
+    return res.status(400).json({ success: false, error: 'All fields required.' });
+  }
 
-    try {
-        //Checks if the email exists in the database.
-        const result = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
-        if (result.rows.length === 0) return res.status(400).send('Invalid email or password.');
+  try {
+    const emailNorm = String(email).trim().toLowerCase();
+    const r = await pool.query(
+      'SELECT id, email, username, password FROM users WHERE lower(email)=lower($1) LIMIT 1',
+      [emailNorm]
+    );
 
-        //Compares the provided password with the hashed password in the database.
-        const match = await bcrypt.compare(password, result.rows[0].password);
-        if (!match) return res.status(400).send('Invalid email or password.');
-
-        res.redirect('/Home.html');
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error logging in.');
+    if (r.rows.length === 0) {
+      console.warn('[LOGIN] user not found:', emailNorm);
+      return res.status(400).json({ success: false, error: 'Invalid email or password.' });
     }
+
+    const user = r.rows[0];
+    const hashPrefix = String(user.password).slice(0, 4);
+    console.log('[LOGIN] found user:', user.email, 'hashPrefix:', hashPrefix, 'hashLen:', String(user.password).length);
+
+    const ok = await bcrypt.compare(password, user.password);
+    console.log('[LOGIN] bcrypt.compare ->', ok);
+
+    if (!ok) {
+      return res.status(400).json({ success: false, error: 'Invalid email or password.' });
+    }
+    return res.status(200).json({ success: true, redirectUrl: '/Home.html' });
+  } catch (e) {
+    console.error('[LOGIN] error:', e);
+    return res.status(500).json({ success: false, error: 'Error logging in.' });
+  }
 });
 
 module.exports = router;
