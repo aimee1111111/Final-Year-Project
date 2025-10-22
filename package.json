@@ -21,8 +21,12 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
+    "clamscan": "^2.4.0",
     "cors": "^2.8.5",
+    "execa": "^9.6.0",
     "express": "^5.1.0",
+    "file-type": "^21.0.0",
+    "multer": "^2.0.2",
     "pg": "^8.16.3"
   }
 }

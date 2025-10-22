@@ -1,9 +1,52 @@
-<!doctype html>
-<html>
-  <body>
-    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" required />
-      <button>Upload</button>
-    </form>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>File Upload & Scan</title>
+</head>
+<body>
+  <h1>Upload File for Virus Scan</h1>
+
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="file" id="fileInput" required />
+    <button type="submit">Upload & Scan</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('fileInput');
+      const resultDiv = document.getElementById('result');
+      if (!fileInput.files[0]) return alert('Please select a file');
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      resultDiv.textContent = 'Scanning file...';
+
+      try {
+        const response = await fetch('http://localhost:5000/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const ct = response.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+          const text = await response.text();
+          throw new Error('Server returned non-JSON: ' + text.slice(0, 200));
+        }
+        const result = await response.json();
+        if (result.safe) {
+          resultDiv.textContent = `✓ ${result.message}`;
+        } else {
+          const viruses = result.viruses?.join(', ') || 'Unknown';
+          resultDiv.textContent = `✗ ${result.message}. Viruses: ${viruses}`;
+        }
+      } catch (err) {
+        resultDiv.textContent = `Upload failed: ${err.message}`;
+      }
+    });
+  </script>
+</body>
 </html>

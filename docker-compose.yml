@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  clamav:
+    image: clamav/clamav:stable
+    container_name: clamav
+    restart: unless-stopped
+    ports:
+      - "3310:3310"    # clamd TCP port
+    environment:
+      - CLAMAV_NO_CLAMD=false
+      - CLAMAV_NO_FRESHCLAM=false
+    volumes:
+      - clamdb:/var/lib/clamav   # persist virus DB updates
+volumes:
+  clamdb:
