@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>File Upload & Scan</title>
   <link rel="stylesheet" href="files.css">
+</head>
 <body>
   <h1>Upload File for Virus Scan</h1>
 
@@ -35,11 +36,67 @@
 
     // Helpers
     function setFile(file) {
-      // Put dropped file into the hidden input so form logic stays the same
       const dt = new DataTransfer();
       dt.items.add(file);
       fileInput.files = dt.files;
       fileNameEl.textContent = `Selected: ${file.name}`;
+    }
+
+    function renderResult(result) {
+      // Primary line (clean vs threats)
+      let header;
+      if (result.safe) {
+        header = `✓ ${result.message || 'File is clean'}`;
+      } else {
+        const items = (result.threats && result.threats.length)
+          ? result.threats.join(', ')
+          : 'Unknown';
+        header = `✗ ${result.message || 'Threats detected'} — ${items}`;
+      }
+
+      // Per-engine breakdown from scan_results (ClamAV + YARA)
+      let breakdown = '';
+      if (Array.isArray(result.scan_results)) {
+        const parts = result.scan_results.map(r => {
+          const eng = r.engine || 'Engine';
+          const status = r.status || 'unknown';
+
+          // details can be a string or array (YARA threats array)
+          let detail = '';
+          if (r.details) {
+            if (typeof r.details === 'string') {
+              detail = ` — ${r.details}`;
+            } else if (Array.isArray(r.details)) {
+              // YARA details array of matches: show rule names
+              const rules = r.details.map(d => d.rule || JSON.stringify(d)).join('; ');
+              detail = rules ? ` — ${rules}` : '';
+            } else if (typeof r.details === 'object') {
+              detail = ` — ${JSON.stringify(r.details)}`;
+            }
+          }
+          if (r.error) {
+            detail = ` — error: ${r.error}`;
+          }
+          return `${eng}: ${status}${detail}`;
+        });
+        breakdown = parts.join(' | ');
+      }
+
+      // Fallback to engines dict if present
+      if (!breakdown && result.engines) {
+        const parts = [];
+        for (const [name, obj] of Object.entries(result.engines)) {
+          if (!obj) continue;
+          const status = obj.safe === true ? 'clean'
+                        : obj.safe === false ? 'threat_detected'
+                        : 'error';
+          const detail = obj.threat || obj.error || '';
+          parts.push(`${name}: ${status}${detail ? ' — ' + detail : ''}`);
+        }
+        breakdown = parts.join(' | ');
+      }
+
+      resultDiv.textContent = breakdown ? `${header} (${breakdown})` : header;
     }
 
     async function uploadCurrentFile() {
@@ -65,12 +122,11 @@
         }
 
         const result = await response.json();
-        if (result.safe) {
-          resultDiv.textContent = `✓ ${result.message}`;
-        } else {
-          const viruses = result.viruses?.join(', ') || 'Unknown';
-          resultDiv.textContent = `✗ ${result.message}. Viruses: ${viruses}`;
+        if (!response.ok) {
+          throw new Error(result.message || `Server error (${response.status})`);
         }
+
+        renderResult(result);
       } catch (err) {
         resultDiv.textContent = `Upload failed: ${err.message}`;
       }
@@ -111,7 +167,7 @@
     dropzone.addEventListener('drop', (e) => {
       const files = e.dataTransfer.files;
       if (!files || !files.length) return;
-      // Use the first file (adjust if you want multiple)
+
       setFile(files[0]);
     });
 
@@ -121,6 +177,6 @@
       await uploadCurrentFile();
     });
   </script>
-  
+
 </body>
 </html>
