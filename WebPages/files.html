@@ -4,26 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>File Upload & Scan</title>
-</head>
+  <link rel="stylesheet" href="files.css">
 <body>
   <h1>Upload File for Virus Scan</h1>
 
   <form id="uploadForm" enctype="multipart/form-data">
-    <input type="file" name="file" id="fileInput" required />
-    <button type="submit">Upload & Scan</button>
+    <input type="file" name="file" id="fileInput" hidden />
+
+    <div id="dropzone"
+         class="dropzone"
+         role="button"
+         tabindex="0"
+         aria-label="File upload dropzone. Press Enter to choose a file or drop a file here.">
+      <div>📄 Drop your file here</div>
+      <div class="hint">or click to choose a file</div>
+      <div id="fileName" aria-live="polite"></div>
+    </div>
+
+    <button type="submit">Upload &amp; Scan</button>
   </form>
 
-  <div id="result"></div>
+  <div id="result" aria-live="polite"></div>
 
   <script>
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById('fileInput');
-      const resultDiv = document.getElementById('result');
-      if (!fileInput.files[0]) return alert('Please select a file');
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const dropzone = document.getElementById('dropzone');
+    const resultDiv = document.getElementById('result');
+    const fileNameEl = document.getElementById('fileName');
 
+    // Helpers
+    function setFile(file) {
+      // Put dropped file into the hidden input so form logic stays the same
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      fileInput.files = dt.files;
+      fileNameEl.textContent = `Selected: ${file.name}`;
+    }
+
+    async function uploadCurrentFile() {
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('Please select a file');
+        return;
+      }
       const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
+      formData.append('file', file);
       resultDiv.textContent = 'Scanning file...';
 
       try {
@@ -31,11 +57,13 @@
           method: 'POST',
           body: formData
         });
+
         const ct = response.headers.get('content-type') || '';
         if (!ct.includes('application/json')) {
           const text = await response.text();
           throw new Error('Server returned non-JSON: ' + text.slice(0, 200));
         }
+
         const result = await response.json();
         if (result.safe) {
           resultDiv.textContent = `✓ ${result.message}`;
@@ -46,7 +74,53 @@
       } catch (err) {
         resultDiv.textContent = `Upload failed: ${err.message}`;
       }
+    }
+
+    // Click to open file picker
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+
+    // Show chosen file name when using picker
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files[0];
+      fileNameEl.textContent = f ? `Selected: ${f.name}` : '';
+    });
+
+    // Drag & drop events
+    ['dragenter','dragover'].forEach(evtName => {
+      dropzone.addEventListener(evtName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      });
+    });
+
+    ['dragleave','drop'].forEach(evtName => {
+      dropzone.addEventListener(evtName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      });
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      if (!files || !files.length) return;
+      // Use the first file (adjust if you want multiple)
+      setFile(files[0]);
+    });
+
+    // Submit handler (works for both picker and drop)
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await uploadCurrentFile();
     });
   </script>
+  
 </body>
 </html>
