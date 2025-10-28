@@ -6,10 +6,22 @@
   <title>File Upload & Scan</title>
   <link rel="stylesheet" href="files.css">
 </head>
+
+<nav class="navbar">
+    <div class="nav-left">
+      <h2 class="logo">ThreatCheck</h2>
+    </div>
+    <div class="nav-right">
+      <a href="Home.html">Home</a>
+      <a href="Information.html">Information</a>
+      <a href="ScanHistory.html">Scan History</a>
+      <a href="logout.html" class="logout-btn">Log Out</a>
+    </div>
+  </nav>
 <body>
   <h1>Upload File for Virus Scan</h1>
 
-  <form id="uploadForm" enctype="multipart/form-data">
+  <form id="uploadForm" enctype="multipart/form-data" class="panel">
     <input type="file" name="file" id="fileInput" hidden />
 
     <div id="dropzone"
@@ -22,81 +34,133 @@
       <div id="fileName" aria-live="polite"></div>
     </div>
 
-    <button type="submit">Upload &amp; Scan</button>
+    <div class="row">
+      <button type="submit" class="btn btn-primary">Upload &amp; Scan</button>
+      <button type="button" id="clearBtn" class="btn btn-ghost">Clear</button>
+    </div>
   </form>
 
-  <div id="result" aria-live="polite"></div>
+  <div id="result" class="panel" aria-live="polite" style="display:none;"></div>
+  <div id="details" class="panel" style="display:none;"></div>
 
   <script>
     const form = document.getElementById('uploadForm');
     const fileInput = document.getElementById('fileInput');
     const dropzone = document.getElementById('dropzone');
     const resultDiv = document.getElementById('result');
+    const detailsDiv = document.getElementById('details');
     const fileNameEl = document.getElementById('fileName');
+    const clearBtn = document.getElementById('clearBtn');
 
-    // Helpers
+    let currentFile = null;
+
+    function bytesToHuman(n) {
+      if (!Number.isFinite(n)) return '';
+      const units = ['B','KB','MB','GB','TB'];
+      let i = 0; let v = n;
+      while (v >= 1024 && i < units.length-1) { v /= 1024; i++; }
+      return `${v.toFixed(v >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
+    }
+
     function setFile(file) {
       const dt = new DataTransfer();
       dt.items.add(file);
       fileInput.files = dt.files;
-      fileNameEl.textContent = `Selected: ${file.name}`;
+      currentFile = file;
+      fileNameEl.textContent = `Selected: ${file.name} (${bytesToHuman(file.size)})`;
     }
 
-    function renderResult(result) {
-      // Primary line (clean vs threats)
-      let header;
+    function renderHeader(result) {
+      let text, cls;
       if (result.safe) {
-        header = `✓ ${result.message || 'File is clean'}`;
+        text = `✓ ${result.message || 'File is clean'}`;
+        cls = 'ok';
       } else {
         const items = (result.threats && result.threats.length)
           ? result.threats.join(', ')
           : 'Unknown';
-        header = `✗ ${result.message || 'Threats detected'} — ${items}`;
+        text = `✗ ${result.message || 'Threats detected'} — ${items}`;
+        cls = 'bad';
       }
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `<div class="${cls}">${text}</div>`;
+    }
 
-      // Per-engine breakdown from scan_results (ClamAV + YARA)
-      let breakdown = '';
-      if (Array.isArray(result.scan_results)) {
-        const parts = result.scan_results.map(r => {
-          const eng = r.engine || 'Engine';
-          const status = r.status || 'unknown';
+    function renderDetailsForm(result) {
+      detailsDiv.style.display = 'block';
+      const when = new Date().toLocaleString();
+      const verdict = result.safe ? 'Clean' : 'Threats detected';
+      const verdictClass = result.safe ? 'ok' : 'bad';
+
+      // Build engines section
+      const engines = Array.isArray(result.scan_results) ? result.scan_results : [];
+      const enginesHTML = engines.map(r => {
+        const eng = r.engine || 'Engine';
+        const status = r.status || 'unknown';
 
           // details can be a string or array (YARA threats array)
-          let detail = '';
-          if (r.details) {
-            if (typeof r.details === 'string') {
-              detail = ` — ${r.details}`;
-            } else if (Array.isArray(r.details)) {
-              // YARA details array of matches: show rule names
-              const rules = r.details.map(d => d.rule || JSON.stringify(d)).join('; ');
-              detail = rules ? ` — ${rules}` : '';
-            } else if (typeof r.details === 'object') {
-              detail = ` — ${JSON.stringify(r.details)}`;
-            }
+        let detail = '';
+        if (r.details) {
+          if (typeof r.details === 'string') {
+            detail = r.details;
+          } else if (Array.isArray(r.details)) {
+            // YARA details array of matches: show rule names
+            const rules = r.details.map(d => d.rule || JSON.stringify(d)).join('; ');
+            detail = rules;
+          } else if (typeof r.details === 'object') {
+            detail = JSON.stringify(r.details);
           }
-          if (r.error) {
-            detail = ` — error: ${r.error}`;
-          }
-          return `${eng}: ${status}${detail}`;
-        });
-        breakdown = parts.join(' | ');
-      }
-
-      // Fallback to engines dict if present
-      if (!breakdown && result.engines) {
-        const parts = [];
-        for (const [name, obj] of Object.entries(result.engines)) {
-          if (!obj) continue;
-          const status = obj.safe === true ? 'clean'
-                        : obj.safe === false ? 'threat_detected'
-                        : 'error';
-          const detail = obj.threat || obj.error || '';
-          parts.push(`${name}: ${status}${detail ? ' — ' + detail : ''}`);
+        } else if (r.error) {
+          detail = `error: ${r.error}`;
         }
-        breakdown = parts.join(' | ');
-      }
 
-      resultDiv.textContent = breakdown ? `${header} (${breakdown})` : header;
+        // Render any YARA tags/meta as chips
+        let chips = '';
+        if (Array.isArray(r.details)) {
+          const allTags = r.details.flatMap(d => d.tags || []);
+          if (allTags.length) {
+            chips = `<div class="muted">Tags: ${[...new Set(allTags)].map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
+          }
+        }
+
+        return `
+          <div class="engine">
+            <div class="field"><label>Engine</label><div>${eng}</div></div>
+            <div class="field"><label>Status</label><div>${status}</div></div>
+            ${detail ? `<div class="field"><label>Details</label><div>${detail}</div></div>` : ''}
+            ${chips}
+          </div>
+        `;
+      }).join('');
+
+      // Threat list
+      const threatList = (result.threats && result.threats.length)
+        ? `<ul>${result.threats.map(t=>`<li>${t}</li>`).join('')}</ul>`
+        : `<div class="muted">No threats listed.</div>`;
+
+      // File meta
+      const fname = currentFile ? currentFile.name : '(unknown)';
+      const fsize = currentFile ? bytesToHuman(currentFile.size) : '';
+      const ftype = currentFile ? (currentFile.type || '—') : '—';
+
+      // Build the final HTML (Hash + download removed)
+      detailsDiv.innerHTML = `
+        <form id="detailsForm" class="kv">
+          <label>Filename</label><input type="text" value="${fname}" readonly />
+          <label>Size</label><input type="text" value="${fsize}" readonly />
+          <label>Type</label><input type="text" value="${ftype}" readonly />
+          <label>Scanned</label><input type="text" value="${when}" readonly />
+          <label>Verdict</label><input class="${verdictClass}" type="text" value="${verdict}" readonly />
+          <div style="grid-column:1/-1; margin-top:8px;">
+            <h3 style="margin:10px 0 4px;">Per-engine results</h3>
+            ${enginesHTML || '<div class="muted">No engine data.</div>'}
+          </div>
+          <div style="grid-column:1/-1; margin-top:8px;">
+            <h3 style="margin:10px 0 4px;">Threats</h3>
+            <div class="threats">${threatList}</div>
+          </div>
+        </form>
+      `;
     }
 
     async function uploadCurrentFile() {
@@ -105,12 +169,18 @@
         alert('Please select a file');
         return;
       }
+      currentFile = file;
       const formData = new FormData();
       formData.append('file', file);
+
+      // Loading state
+      resultDiv.style.display = 'block';
       resultDiv.textContent = 'Scanning file...';
+      detailsDiv.style.display = 'none';
+      detailsDiv.innerHTML = '';
 
       try {
-        const response = await fetch('http://localhost:5000/upload', {
+        const response = await fetch('http://127.0.0.1:5000/upload', {
           method: 'POST',
           body: formData
         });
@@ -123,12 +193,18 @@
 
         const result = await response.json();
         if (!response.ok) {
-          throw new Error(result.message || `Server error (${response.status})`);
+          renderHeader(result);
+          renderDetailsForm(result);
+          return;
         }
 
-        renderResult(result);
+        renderHeader(result);
+        renderDetailsForm(result);
       } catch (err) {
-        resultDiv.textContent = `Upload failed: ${err.message}`;
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `<span class="bad">Upload failed:</span> ${err.message}`;
+        detailsDiv.style.display = 'none';
+        detailsDiv.innerHTML = '';
       }
     }
 
@@ -144,7 +220,8 @@
     // Show chosen file name when using picker
     fileInput.addEventListener('change', () => {
       const f = fileInput.files[0];
-      fileNameEl.textContent = f ? `Selected: ${f.name}` : '';
+      fileNameEl.textContent = f ? `Selected: ${f.name} (${bytesToHuman(f.size)})` : '';
+      currentFile = f || null;
     });
 
     // Drag & drop events
@@ -176,7 +253,19 @@
       e.preventDefault();
       await uploadCurrentFile();
     });
+
+    clearBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      currentFile = null;
+      fileNameEl.textContent = '';
+      resultDiv.style.display = 'none';
+      resultDiv.textContent = '';
+      detailsDiv.style.display = 'none';
+      detailsDiv.innerHTML = '';
+    });
   </script>
 
 </body>
 </html>
+
+
