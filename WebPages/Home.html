@@ -30,21 +30,57 @@
         <span>Files</span>
       </a>
 
-      <button id="urlButton" class="box">
+      <button id="urlButton" class="box" type="button">
         <img src="https://img.icons8.com/ios-filled/100/ffffff/link.png" alt="URL" />
         <span>URL</span>
       </button>
     </div>
 
-    <div id="urlInputBox" class="url-input-box hidden">
+    <div id="urlInputBox" class="url-input-box hidden" aria-live="polite">
       <label for="urlInput">Paste your link:</label>
-      <input type="text" id="urlInput" placeholder="Enter URL here" />
-      <button id="submitUrl">Check Safety</button>
+      <input type="url" id="urlInput" placeholder="Enter URL here" inputmode="url" />
+      <button id="submitUrl" type="button">Check Safety</button>
       <p id="resultMessage"></p>
+    </div>
+  </div>
+
+  <button class="checker-toggle" id="checkerToggle" type="button" aria-expanded="false" aria-controls="checkerPanel">
+    <span>🛡️</span>
+    <span>Check Email/Phone</span>
+  </button>
+
+  <div class="checker-panel" id="checkerPanel" aria-live="polite" style="display:none">
+    <div class="checker-header">
+      <div class="checker-header-left">
+        <div class="checker-icon">🔍</div>
+        <div>
+          <div class="checker-title">Phishing & Scam Detector</div>
+          <div class="checker-subtitle">Analyze emails & phone numbers</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="checker-body" id="checkerBody">
+      <div class="checker-msg bot">
+        👋 <strong>Paste an email or phone number</strong> below and I'll analyze it for phishing and scam indicators.
+        <br /><br />
+        I can detect:
+        <br />• Phishing emails and suspicious messages
+        <br />• Urgent/threatening language
+        <br /><br />
+        Paste your content below to get started!
+      </div>
+    </div>
+
+    <div class="checker-input-area">
+      <label class="checker-label" for="checkerInput">Paste email content or text message:</label>
+      <textarea id="checkerInput" class="checker-textarea" placeholder="Example: Dear Customer, Your account has been suspended. Click here to verify..."></textarea>
+      <button id="checkerSend" class="checker-send" type="button">🔍 Analyze for Threats</button>
     </div>
   </div>
 
   <script type="module" src="url-checker.js"></script>
 
+  <script src="checker.js" defer></script>
 </body>
 </html>

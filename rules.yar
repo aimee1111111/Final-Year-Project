@@ -1,3 +1,4 @@
+import "pe"
 
 rule SuspiciousExecutable {
     meta:
@@ -61,9 +62,9 @@ rule SQLInjectionPattern {
         author = "Threat Check"
         severity = "medium"
     strings:
-        $sql1 = /union\s+select/i
-        $sql2 = /\'\s*or\s*\'1\'\s*=\s*\'1/i
-        $sql3 = /\'\s*or\s*1\s*=\s*1/i
+        $sql1 = /union\s+select/ nocase
+        $sql2 = /'\s*or\s*'1'\s*=\s*'1/ nocase
+        $sql3 = /'\s*or\s*1\s*=\s*1/ nocase
         $sql4 = "xp_cmdshell" nocase
     condition:
         any of them
@@ -89,10 +90,10 @@ rule SuspiciousBatchScript {
         severity = "medium"
     strings:
         $echo_off = "@echo off" nocase
-        $del = /del\s+\/f\s+\/q/i
+        $del = /del\s+\/f\s+\/q/ nocase
         $reg = "reg add" nocase
         $schtasks = "schtasks" nocase
-        $download = /(powershell|curl|wget).*http/i
+        $download = /(powershell|curl|wget).*http/ nocase
     condition:
         $echo_off and 2 of ($del, $reg, $schtasks, $download)
 }
@@ -106,7 +107,7 @@ rule ObfuscatedJavaScript {
         $eval = "eval("
         $unescape = "unescape("
         $fromcharcode = "fromCharCode("
-        $hex = /\\x[0-9a-f]{2}/i
+        $hex = /\\x[0-9a-f]{2}/ nocase
     condition:
         2 of them
 }
@@ -121,7 +122,7 @@ rule PotentialRansomwareNote {
         $ransom2 = "bitcoin" nocase
         $ransom3 = "decrypt" nocase
         $ransom4 = "payment" nocase
-        $ransom5 = /pay.*bitcoins?/i
+        $ransom5 = /pay.*bitcoins?/ nocase
     condition:
         3 of them
 }
@@ -150,11 +151,11 @@ rule SuspiciousPEImports {
     condition:
         pe.number_of_imported_functions > 0 and
         (
-            "VirtualAlloc" in pe.imports("kernel32.dll") or
-            "VirtualProtect" in pe.imports("kernel32.dll") or
-            "CreateRemoteThread" in pe.imports("kernel32.dll") or
-            "LoadLibraryA" in pe.imports("kernel32.dll") or
-            "GetProcAddress" in pe.imports("kernel32.dll")
+            pe.imports("kernel32.dll", "VirtualAlloc") or
+            pe.imports("kernel32.dll", "VirtualProtect") or
+            pe.imports("kernel32.dll", "CreateRemoteThread") or
+            pe.imports("kernel32.dll", "LoadLibraryA") or
+            pe.imports("kernel32.dll", "GetProcAddress")
         )
 }
 
@@ -164,9 +165,9 @@ rule SuspiciousNetworkIndicators {
         author = "Threat Check"
         severity = "medium"
     strings:
-        $url = /(https?:\/\/)?[a-z0-9\.\-]{3,}\.(php|asp|aspx|jsp)\/[^\s'"]*/i
+        $url = /(https?:\/\/)?[a-z0-9\.\-]{3,}\.(php|asp|aspx|jsp)\/[^\s'"]*/ nocase
         $ipport = /\b((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?):(80|8080|8443|4444|8888)\b/
-        $sld = /[a-z0-9\-]{10,}\.(com|xyz|top|site|online)/i
+        $sld = /[a-z0-9\-]{10,}\.(com|xyz|top|site|online)/ nocase
     condition:
         any of them
 }
