@@ -166,7 +166,7 @@
     });
   }
 
-  // Initialize when DOM is ready (script uses defer, but this is extra-safe)
+  // Initialize when DOM is ready 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initEvents);
   } else {

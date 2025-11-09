@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stay Safe Online — Cybersecurity Guide & Quiz</title>
+
+  <link rel="stylesheet" href="information.css" />
+  <script src="information.js" defer></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <h2 class="logo">ThreatCheck</h2>
+    </div>
+    <div class="nav-right">
+      <a href="Home.html">Home</a>
+      <a href="Information.html">Information</a>
+      <a href="ScanHistory.html">Scan History</a>
+      <a href="logout.html" class="logout-btn">Log Out</a>
+    </div>
+  </nav>
+
+  <main class="cyber container">
+    <header class="hero">
+      <div class="panel hero-card">
+        <h1 class="hero-title">Stay Safe Online</h1>
+        <p class="sub">
+          Quick, practical guidance to dodge scams, protect your accounts, and keep your devices safe. Then test yourself with a short quiz.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#quiz">Take the Quiz</a>
+          <a class="btn" href="#rules">See Key Rules</a>
+          <a class="btn btn-ghost" href="#checker">Password Checker</a>
+        </div>
+      </div>
+
+      <div class="panel hero-card">
+        <h3 class="no-top">Cyber Tips</h3>
+        <ul class="tight">
+          <li>✅ <strong>Pause</strong> — Verify before you act.</li>
+          <li>✅ <strong>Protect</strong> — use a password manager + MFA everywhere.</li>
+          <li>✅ <strong>Patch</strong> — keep software & devices up to date.</li>
+          <li>✅ <strong>Secure your internet connection</strong> — use secure Wi-Fi with a password or a trusted VPN.</li>
+        </ul>
+        <p class="sub zero">These tips will stop most attacks you’ll face day-to-day.</p>
+      </div>
+    </header>
+
+    <section id="rules" class="section-pad">
+      <h2 class="section-title">Quick Safety Rules</h2>
+      <div class="grid cards">
+        <div class="panel card">
+          <div class="eyebrow">Phishing</div>
+          <h3>Verify before you click</h3>
+          <ul class="tight">
+            <li>Hover links to preview where they go.</li>
+            <li>Type known sites manually; avoid short links.</li>
+            <li>Don’t open unexpected attachments.</li>
+            <li>Use ThreatCheck tools to scan links, files, and websites for phishing or malware before opening them.</li>
+          </ul>
+        </div>
+
+        <div class="panel card">
+          <div class="eyebrow">Passwords</div>
+          <h3>Use a manager + MFA</h3>
+          <ul class="tight">
+            <li>Unique, 14+ characters per site.</li>
+            <li>Prefer passphrases or generated passwords.</li>
+            <li>Enable app-based MFA (not SMS when possible).</li>
+            <li>Use ThreatCheck’s password checker for secure password generation.</li>
+          </ul>
+        </div>
+
+        <div class="panel card">
+          <div class="eyebrow">Devices</div>
+          <h3>Update & backup</h3>
+          <ul class="tight">
+            <li>Automatic updates for OS, apps, browsers.</li>
+            <li>Daily/weekly backups to offline or cloud.</li>
+            <li>Install from trusted stores only.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad">
+      <h2 class="section-title">Common Threats</h2>
+
+      <details class="accordion">
+        <summary>
+          <div class="title"><strong>Phishing</strong><span class="pill warn">Learn more ▸</span></div>
+        </summary>
+        <p>
+          Messages that try to trick you into clicking links or sharing information. Look for bad grammar, mismatched domains, or pressure (“act now”). When unsure, contact the sender using a known-good channel.
+        </p>
+      </details>
+
+      <details class="accordion">
+        <summary>
+          <div class="title"><strong>Ransomware</strong><span class="pill warn">Learn more ▸</span></div>
+        </summary>
+        <p>
+          Malware that locks files and demands payment. Protection = patching, least-privilege, offline backups, and being cautious with macros and attachments.
+        </p>
+      </details>
+
+      <details class="accordion">
+        <summary>
+          <div class="title"><strong>Denial-of-service attack</strong><span class="pill warn">Learn more ▸</span></div>
+        </summary>
+        <p>
+          A denial-of-service (DoS) attack overwhelms a website, application, or system with fraudulent traffic, making it unavailable to legitimate users. A distributed denial-of-service (DDoS) uses a botnet of infected devices to amplify the attack.
+        </p>
+      </details>
+
+      <details class="accordion">
+        <summary>
+          <div class="title"><strong>Public Wi-Fi Risks</strong><span class="pill warn">Learn more ▸</span></div>
+        </summary>
+        <p>
+          Use HTTPS-only sites, a trusted VPN, and avoid sensitive logins on open networks. Disable auto-join and sharing features.
+        </p>
+      </details>
+
+      <details class="accordion">
+        <summary>
+          <div class="title"><strong>Social Engineering</strong><span class="pill warn">Learn more ▸</span></div>
+        </summary>
+        <p>
+          Manipulation that convinces targets to take actions that expose confidential information, threaten finances, or compromise security.
+        </p>
+        <h4>🎣 Common Types of Phishing</h4>
+        <ul class="tight">
+          <li>🎯 <strong>Spear Phishing</strong> — Highly targeted attacks using personal details to appear legitimate.</li>
+          <li>🐋 <strong>Whale Phishing</strong> — Targets high-profile individuals such as executives or business owners.</li>
+          <li>🏢 <strong>Business Email Compromise (BEC)</strong> — Impersonation of executives or vendors to trick staff into sending money or data.</li>
+        </ul>
+      </details>
+
+      <details class="accordion">
+        <summary>
+          <div class="title"><strong>Malware</strong><span class="pill warn">Learn more ▸</span></div>
+        </summary>
+        <p>
+          Short for “malicious software” — code intentionally written to harm a computer system or its users.
+        </p>
+        <h3>Spot malware on your device:</h3>
+        <ul class="tight">
+          <li>⚠️ <strong>Unusual slowdowns</strong> — device suddenly runs much slower or overheats.</li>
+          <li>📈 <strong>Strange network/data activity</strong> — unexpected spikes when you’re idle.</li>
+          <li>🧩 <strong>Pop-ups and redirects</strong> — especially on sites that normally don’t show them.</li>
+          <li>💾 <strong>Corrupted or missing files</strong> — files disappear, get renamed, or become inaccessible.</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- Password Strength Checker -->
+    <section id="checker" class="section-pad">
+      <h2 class="section-title">
+        Password Strength Checker <span class="eyebrow">(all local, no data leaves this page)</span>
+      </h2>
+
+      <div class="panel">
+        <label for="pw" class="eyebrow">Try a sample password </label>
+        <input id="pw" type="text" class="input" placeholder="Type here…" />
+        <div class="meter"><span id="pwbar"></span></div>
+        <div id="pwtips" class="sub">Start typing to get tips…</div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="section-pad">
+      <h2 class="section-title">Cyber Safety Quiz</h2>
+      <div class="panel quiz">
+        <p class="sub zero">10 questions • Select the best answer, then submit at the bottom.</p>
+        <div id="qwrap"></div>
+
+        <div class="quiz-actions">
+          <button id="submitBtn" class="btn btn-primary">Submit Answers</button>
+          <button id="resetBtn" class="btn btn-ghost">Reset</button>
+
+          <div class="score">
+            <div class="scorebar"><span id="scorebar"></span></div>
+            <div id="scoreText" class="sub score-text">Score: 0/10</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resources -->
+    <section class="section-pad">
+      <h2 class="section-title">Trusted Resources</h2>
+      <div class="grid cards two">
+        <div class="panel card">
+          <h3>National advice</h3>
+          <ul class="tight">
+            <li><a href="https://www.ncsc.gov.ie" target="_blank" rel="noopener">NCSC (Ireland)</a></li>
+            <li><a href="https://www.ncsc.gov.uk/cyberaware/home" target="_blank" rel="noopener">NCSC (UK) Cyber Aware</a></li>
+            <li><a href="https://www.cisa.gov/shields-up" target="_blank" rel="noopener">CISA Shields Up</a></li>
+          </ul>
+        </div>
+
+        <div class="panel card">
+          <h3>Check a link or email</h3>
+          <ul class="tight">
+            <li>Right-click → Copy link</span> then paste to inspect domain.</li>
+            <li>Search the sender’s domain on the web to verify legitimacy.</li>
+            <li>Use ThreatCheck to test emails, files, and URLs for threats.</li>
+            <li>Report suspicious emails to your provider or IT team.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
