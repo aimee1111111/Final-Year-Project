@@ -14,12 +14,22 @@ router.post('/signup', async (req, res) => {
     const usernameNorm = String(username).trim();
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query(
-      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
+    
+    // Get the newly created user ID
+    const result = await pool.query(
+      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email',
       [usernameNorm, emailNorm, hashedPassword]
     );
 
-    return res.status(201).json({ success: true, redirectUrl: '/Home.html' });
+    const newUser = result.rows[0];
+
+    return res.status(201).json({ 
+      success: true, 
+      user_id: newUser.id,
+      username: newUser.username,
+      email: newUser.email,
+      redirectUrl: '/Home.html' 
+    });
   } catch (err) {
     console.error('[SIGNUP] error:', err);
     return res.status(500).json({ success: false, error: 'Error signing up. Please try again.' });
@@ -55,11 +65,21 @@ router.post('/login', async (req, res) => {
     if (!ok) {
       return res.status(400).json({ success: false, error: 'Invalid email or password.' });
     }
-    return res.status(200).json({ success: true, redirectUrl: '/Home.html' });
+    
+    // FIXED: Return user_id and username in the response
+    return res.status(200).json({ 
+      success: true, 
+      user_id: user.id,
+      username: user.username,
+      email: user.email,
+      redirectUrl: '/Home.html' 
+    });
   } catch (e) {
     console.error('[LOGIN] error:', e);
     return res.status(500).json({ success: false, error: 'Error logging in.' });
   }
 });
+
+
 
 module.exports = router;

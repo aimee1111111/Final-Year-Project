@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scan History</title>
+  <link rel="stylesheet" href="ScanHistory.css" />
+  <script defer src="History.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <h2 class="logo">ThreatCheck</h2>
+    </div>
+    <div class="nav-right">
+      <a href="Home.html">Home</a>
+      <a href="Information.html">Information</a>
+      <a href="ScanHistory.html" class="active">Scan History</a>
+      <a href="logout.html" class="logout-btn">Log Out</a>
+    </div>
+  </nav>
+
+  <main class="history-main">
+    <h1>Your Scan History</h1>
+
+    <div class="panel panel-history">
+      <table class="scan-table" aria-describedby="history-desc">
+        <caption id="history-desc">
+          List of previously scanned files and their results
+        </caption>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Filename</th>
+            <th>Status</th>
+            <th>Message</th>
+            <th>Threats</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="scanHistoryBody">
+          <tr>
+            <td colspan="6" class="muted">
+              <span class="spinner"></span>
+              Loading your scan history...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Details modal -->
+  <div id="scanDetailsModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-content">
+      <button class="close-btn" id="closeModal" aria-label="Close details">
+        &times;
+      </button>
+      <h2>Scan Details</h2>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+</body>
+</html>

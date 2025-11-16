@@ -28,6 +28,18 @@ form.addEventListener('submit', async (e) => {
     try { result = await res.json(); } catch {}
 
     if (res.ok && result.success) {
+      // FIXED: Store user data in localStorage before redirecting
+      if (result.user_id) {
+        localStorage.setItem('user_id', result.user_id);
+      }
+      if (result.username) {
+        localStorage.setItem('username', result.username);
+      }
+      if (result.email) {
+        localStorage.setItem('email', result.email);
+      }
+      
+      // Now redirect
       window.location.href = result.redirectUrl || '/Home.html';
     } else {
       errorBox.textContent = result.error || 'Login failed. Please check your email and password.';

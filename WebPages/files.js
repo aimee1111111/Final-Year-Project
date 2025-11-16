@@ -56,13 +56,11 @@
     const verdict = result.safe ? 'Clean' : 'Threats detected';
     const verdictClass = result.safe ? 'ok' : 'bad';
 
-    // Build list of per-engine results
     const engines = Array.isArray(result.scan_results) ? result.scan_results : [];
     const enginesHTML = engines.map(r => {
       const eng = r.engine || 'Engine';
       const status = r.status || 'unknown';
 
-      // Build "details" text safely
       let detail = '';
       if (r.details) {
         if (typeof r.details === 'string') {
@@ -77,7 +75,6 @@
         detail = `error: ${r.error}`;
       }
 
-      // Collect tags (if present)
       let chips = '';
       if (Array.isArray(r.details)) {
         const allTags = r.details.flatMap(d => d.tags || []);
@@ -88,7 +85,6 @@
         }
       }
 
-      // Return one engine’s section
       return `
         <div class="engine">
           <div class="field"><label>Engine</label><div>${eng}</div></div>
@@ -99,17 +95,14 @@
       `;
     }).join('');
 
-    // Threat list summary
     const threatList = (result.threats && result.threats.length)
       ? `<ul>${result.threats.map(t => `<li>${t}</li>`).join('')}</ul>`
       : `<div class="muted">No threats listed.</div>`;
 
-    // File metadata
     const fname = currentFile ? currentFile.name : '(unknown)';
     const fsize = currentFile ? bytesToHuman(currentFile.size) : '';
     const ftype = currentFile ? (currentFile.type || '—') : '—';
 
-    // Final detailed form markup
     detailsDiv.innerHTML = `
       <form id="detailsForm" class="kv">
         <label>Filename</label><input type="text" value="${fname}" readonly />
@@ -129,7 +122,7 @@
     `;
   }
 
-  //Upload file to backend and handle response
+  // ✅ Upload file to backend and handle response (via Node, with user_id)
   async function uploadCurrentFile() {
     const file = fileInput.files[0];
     if (!file) {
@@ -137,8 +130,17 @@
       return;
     }
     currentFile = file;
+
+    // ✅ Get logged-in user_id from localStorage
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+      alert('You must be logged in to scan a file.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('user_id', userId); // ✅ send user_id to Node
 
     // Loading state
     resultDiv.style.display = 'block';
@@ -147,13 +149,12 @@
     detailsDiv.innerHTML = '';
 
     try {
-      // Send file to backend API
-      const response = await fetch('http://127.0.0.1:5000/upload', {
+      // ✅ Call Node /upload route, not Flask directly
+      const response = await fetch('/upload', {
         method: 'POST',
         body: formData
       });
 
-      // Ensure we got JSON back
       const ct = response.headers.get('content-type') || '';
       if (!ct.includes('application/json')) {
         const text = await response.text();
@@ -166,7 +167,6 @@
       renderHeader(result);
       renderDetailsForm(result);
     } catch (err) {
-      // Display error message
       resultDiv.style.display = 'block';
       resultDiv.innerHTML = `<span class="bad">Upload failed:</span> ${err.message}`;
       detailsDiv.style.display = 'none';
