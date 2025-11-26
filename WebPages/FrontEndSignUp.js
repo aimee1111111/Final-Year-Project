@@ -33,15 +33,17 @@ form.addEventListener('submit', async (e) => {
     });
 
     console.log('Response status:', res.status);
+
     const result = await res.json();
     console.log('Response data:', result);
+
 
     const ok = res.ok && (result.success === true || result.status === 'success');
 
     if (ok) {
       console.log('Signup successful, saving user info and redirecting...');
 
-      // ✅ Store user info in localStorage
+      // Store user info in localStorage
       if (result.user_id) localStorage.setItem('user_id', result.user_id);
       if (result.username) localStorage.setItem('username', result.username);
       if (result.email) localStorage.setItem('email', result.email);

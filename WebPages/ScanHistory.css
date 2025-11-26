@@ -160,16 +160,10 @@ body {
   transform: translateY(1px);
 }
 
-
-
-
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* ============================
-   Modal (matches panel style)
-   ============================ */
 
 .modal {
   position: fixed;

@@ -239,6 +239,8 @@ function grade() {
 // Render all quiz questions on page load
 renderQuiz();
 
+//Event listeners
+
 // Handle quiz submission and grading
 if (submitBtn) submitBtn.addEventListener('click', grade);
 

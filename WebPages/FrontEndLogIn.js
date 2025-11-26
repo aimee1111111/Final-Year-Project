@@ -28,7 +28,7 @@ form.addEventListener('submit', async (e) => {
     try { result = await res.json(); } catch {}
 
     if (res.ok && result.success) {
-      // FIXED: Store user data in localStorage before redirecting
+      //Store user data in localStorage before redirecting
       if (result.user_id) {
         localStorage.setItem('user_id', result.user_id);
       }

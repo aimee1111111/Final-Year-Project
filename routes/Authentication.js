@@ -15,7 +15,6 @@ router.post('/signup', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Get the newly created user ID
     const result = await pool.query(
       'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email',
       [usernameNorm, emailNorm, hashedPassword]
@@ -66,7 +65,6 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Invalid email or password.' });
     }
     
-    // FIXED: Return user_id and username in the response
     return res.status(200).json({ 
       success: true, 
       user_id: user.id,
@@ -79,7 +77,5 @@ router.post('/login', async (req, res) => {
     return res.status(500).json({ success: false, error: 'Error logging in.' });
   }
 });
-
-
 
 module.exports = router;

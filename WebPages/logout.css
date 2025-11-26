@@ -40,19 +40,19 @@ h1 {
 }
 
 .btn.yes {
-    background-color: #ff4d4d;
+    background-color: #0ba427;;
 }
 
 .btn.yes:hover {
-    background-color: #ff1a1a;
+    background-color: #0ba427;
     transform: scale(1.1);
 }
 
 .btn.no {
-    background-color: #4CAF50;
+    background-color: #b61212;
 }
 
 .btn.no:hover {
-    background-color: #2e8b57;
+    background-color: #b61212;
     transform: scale(1.1);
 }
