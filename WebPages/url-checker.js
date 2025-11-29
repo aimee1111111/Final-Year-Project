@@ -5,11 +5,11 @@ import {//import api keys from config file
 } from "./config.js";
 // Main logic
 document.addEventListener("DOMContentLoaded", () => {
-  const urlButton = document.getElementById("urlButton");
+  const urlButton   = document.getElementById("urlButton");
   const urlInputBox = document.getElementById("urlInputBox");
-  const submitUrl = document.getElementById("submitUrl");
+  const submitUrl   = document.getElementById("submitUrl");  // ⬅️ fix here
   const resultMessage = document.getElementById("resultMessage");
-  const urlInput = document.getElementById("urlInput");
+  const urlInput    = document.getElementById("urlInput");
 
   // Toggle URL input box visibility
   urlButton.addEventListener("click", () => {
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     urlInputBox.style.display = isHidden ? "block" : "none";
     if (isHidden) urlInput.focus();
   });
-// Handle URL submission
+// Handle URL submissionubmitUrl
   submitUrl.addEventListener("click", async () => {
     const url = (urlInput.value || "").trim();
     if (!url) {

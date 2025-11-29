@@ -164,6 +164,9 @@ body {
   to { transform: rotate(360deg); }
 }
 
+/* ============================
+   Modal (matches panel style)
+   ============================ */
 
 .modal {
   position: fixed;

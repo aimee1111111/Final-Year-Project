@@ -98,16 +98,16 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     `;
 
     const values = [
-      userId,
-      req.file.originalname,
-      Number(req.file.size),
-      req.file.mimetype || null,
-      sha256,
-      safe,
-      message,
-      JSON.stringify(threats),
-      JSON.stringify(scanResults),
-      req.ip || null
+      userId,                          // $1 - integer user_id
+      req.file.originalname,           // $2 - filename
+      Number(req.file.size),           // $3 - size_bytes
+      req.file.mimetype || null,       // $4 - mime_type
+      sha256,                          // $5 - sha256
+      safe,                            // $6 - safe
+      message,                         // $7 - message
+      JSON.stringify(threats),         // $8 - threats (jsonb)
+      JSON.stringify(scanResults),     // $9 - scan_results (jsonb)
+      req.ip || null,                  // $10 - source_ip
     ];
 
     const { rows } = await pool.query(insertSQL, values);
@@ -126,7 +126,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     cleanup();
     console.error('Upload/Insert error:', err.stack || err);
 
-    // Postgres FK violation → user doesn't exist
+    // Handle foreign key constraint violations
     if (err.code === '23503') {
       return res.status(404).json({
         message: 'User not found',

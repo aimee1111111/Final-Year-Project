@@ -112,17 +112,20 @@ def load_labeled_examples() -> Tuple[List[str], List[int]]:
         for line in f:
             try:
                 obj = json.loads(line)
-                txt = (obj.get("text") or "").strip()
+                txt = (obj.get("text") or "").strip() #gets message
                 if txt:
                     X.append(txt)
-                    y.append(int(1 if obj.get("label") else 0))
+                    y.append(int(1 if obj.get("label") else 0))#gets label 1 = phisihing, 0 = legit
             except Exception:
                 continue
     return X, y
 
 #Features & Models
 def build_features() -> FeatureUnion:
-    # Word-level 1–2 grams + char 3–5 grams; capped to avoid vocab blowup
+    #TF (Term Frequency) – how often it appears in this message.
+    #IDF (Inverse Document Frequency) – how rare it is across all messages.
+    # Word-level 1–2 grams (example: "verify account" =2gram)
+    # + char 3–5 grams; capped to avoid vocab blowup (example: "v3rify" = 'v3r','3ri','rif','ify', etc)
     return FeatureUnion([
         ("word", TfidfVectorizer(
             analyzer="word", ngram_range=(1,2),
@@ -130,7 +133,9 @@ def build_features() -> FeatureUnion:
         )),
         ("char", TfidfVectorizer(
             analyzer="char_wb", ngram_range=(3,5),
-            min_df=2, max_df=0.95, max_features=3000
+            min_df=2, max_df=0.95, max_features=3000 
+            #Drop tokens that appear in fewer than 2 documents
+            #Drop tokens that appear in more than 95% of documents
         )),
     ])
 
@@ -140,6 +145,7 @@ def build_ensemble() -> VotingClassifier:
     lr = Pipeline([
         ("features", feats),
         ("clf", CalibratedClassifierCV(
+            #If phishing vs legit is imbalanced, it automatically up-weights the minority class.
             LogisticRegression(max_iter=2000, class_weight="balanced", solver="liblinear"),
             method="sigmoid", cv=3
         ))
@@ -201,6 +207,7 @@ class OnlineModel:
         try: joblib.dump({"features": self.features, "sgd": self.sgd, "fitted": self._fitted}, path)
         except Exception as e: print(f"Online.save error: {e}", file=sys.stderr)
 
+#This is what is called at startup so the online learner remembers previous feedback
     def load(self, path: str = ONLINE_MODEL_PATH) -> bool:
         # Load persisted online model
         if not os.path.exists(path): return False
@@ -211,6 +218,7 @@ class OnlineModel:
         except Exception as e:
             print(f"Online.load error: {e}", file=sys.stderr); return False
 
+#fake training examples
 def _augment(samples: List[str], brands: List[str], n: int) -> List[str]:
     # Simple synthetic data: brand injection + light obfuscation + TLD tail
     tlds = ["com","net","org","co","io","xyz"]
@@ -228,6 +236,7 @@ def build_or_load_model(force: bool=False) -> VotingClassifier:
     # Train if forced or data is newer than model; include all JSONL feedback
     X_user, y_user = load_labeled_examples()
 
+#get latest model if exists
     if not force and os.path.exists(MODEL_PATH):
         try:
             model_time = os.path.getmtime(MODEL_PATH)
@@ -330,7 +339,6 @@ def ml_probability(text: str) -> float:
     return float(max(0.01, min(0.99, 0.70*pb + 0.30*po)))
 
 def verdict(score_0_100: int, ml_p: float) -> Dict[str, str]:
-    # Join heuristics (30%) and ML (70%) into risk label and color
     blended = (score_0_100/100.0 * 0.50) + (ml_p * 0.50)
     if blended >= 0.65: return {"label":"⚠️ Highly Suspicious","risk_pct":f"{round(blended*100)}%","color":"red"}
     if blended >= 0.40: return {"label":"🟠 Suspicious","risk_pct":f"{round(blended*100)}%","color":"orange"}

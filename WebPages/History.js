@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalBackdrop = document.getElementById('modalBackdrop');
 
   // USER ID RETRIEVAL
-  // Retrieves user_id from localStorage OR sessionStorage.
+  // Retrieves user_id from localStorage 
   // Ensures invalid values like "null" or "undefined" are ignored.
   const getId = (k) => {
     const v = localStorage.getItem(k) ?? sessionStorage.getItem(k);
@@ -43,7 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Converts threats field to readable text
   const formatThreats = (raw) => {
     if (!raw) return 'None';
+    //if list join with commas
     if (Array.isArray(raw)) return raw.join(', ') || 'None';
+    //if text return as is
     if (typeof raw === 'string') return raw || 'None';
 
     // Fallback for objects
@@ -117,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
 
             <td>
-              <!-- Button triggers modal -->
               <button
                 class="details-btn"
                 data-id="${scan.id}"

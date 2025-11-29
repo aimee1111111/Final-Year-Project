@@ -1,7 +1,7 @@
 //Password checker
-const pw = document.querySelector('#pw');
-const pwbar = document.querySelector('#pwbar');
-const pwtips = document.querySelector('#pwtips');
+const pw = document.querySelector('#pw');//password box where you type password
+const pwbar = document.querySelector('#pwbar');//the colored bar that shows how strong it is
+const pwtips = document.querySelector('#pwtips');//advice
 
 function scorePassword(s) {
   if (!s) return 0;
