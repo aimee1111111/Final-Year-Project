@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const authRoutes = require('./routes/Authentication');
-const scanRoutes = require('./routes/ScanHistory');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -11,7 +10,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/', authRoutes);
-app.use('/', scanRoutes);
 
 app.use(express.static(path.join(__dirname, 'WebPages')));
 

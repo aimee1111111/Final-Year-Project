@@ -106,7 +106,7 @@ rule SuspiciousBatchScript {
         author = "Threat Check"
         severity = "medium"
     strings:
-        $echo_off = "@echo off" nocase     // Common in batch scripts
+        $echo_off = "@echo off" nocase     // Common in batch scripts. used to hide commands
         $del = /del\s+\/f\s+\/q/ nocase    // Forced file deletion
         $reg = "reg add" nocase            // Registry modification
         $schtasks = "schtasks" nocase      // Task scheduling persistence

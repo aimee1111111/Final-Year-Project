@@ -1,138 +1,123 @@
 from flask import Flask, request, jsonify, send_from_directory
-import clamd
-import yara
 from flask_cors import CORS
+from datetime import datetime, timezone
 import traceback
 import os
 
+from scanning import scan_single_file
+from db import init_db_pool, save_scan_to_db, get_history
+
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
-app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 20 MB
-
-# --- Engines ---------------------------------------------------------------
-
-# ClamAV (expects a local clamd listening on 3310)
-cd = clamd.ClamdNetworkSocket(host='127.0.0.1', port=3310)
-
-# YARA: load ONLY from external rules file
-YARA_RULES_PATH = os.environ.get('YARA_RULES_PATH', 'rules.yar')
-yara_rules = None
-try:
-    if os.path.exists(YARA_RULES_PATH):
-        yara_rules = yara.compile(filepath=YARA_RULES_PATH)
-        print(f"[YARA] Rules loaded from: {YARA_RULES_PATH}")
-    else:
-        print(f"[YARA] Rules file not found at: {YARA_RULES_PATH}. YARA scanning will be disabled.")
-except Exception as e:
-    print(f"[YARA] Failed to load rules: {e}. YARA scanning will be disabled.")
-    yara_rules = None
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB
 
 
-def scan_with_clamav(file_stream):
-    """Scan file with ClamAV."""
-    try:
-        file_stream.seek(0)
-        res = cd.instream(file_stream)
-        status, sig = list(res.values())[0]
-        if status == 'FOUND':
-            return {'safe': False, 'engine': 'ClamAV', 'threat': sig}
-        return {'safe': True, 'engine': 'ClamAV'}
-    except Exception as e:
-        return {'safe': None, 'engine': 'ClamAV', 'error': str(e)}
+def get_client_ip():
+    forwarded = request.headers.get("X-Forwarded-For", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.remote_addr or ""
 
 
-def scan_with_yara(file_stream):
-    """Scan file with YARA rules (in-memory)."""
-    if not yara_rules:
-        return {'safe': None, 'engine': 'YARA', 'error': 'YARA rules not loaded'}
-
-    try:
-        file_stream.seek(0)
-        data = file_stream.read()  # bytes
-        matches = yara_rules.match(data=data)
-
-        if matches:
-            threats = [{'rule': m.rule, 'tags': m.tags, 'meta': m.meta} for m in matches]
-            return {'safe': False, 'engine': 'YARA', 'threats': threats}
-
-        return {'safe': True, 'engine': 'YARA'}
-    except Exception as e:
-        return {'safe': None, 'engine': 'YARA', 'error': str(e)}
-
-
-# --- Routes ----------------------------------------------------------------
-
-@app.route('/')
+@app.route("/")
 def root():
-    return send_from_directory('.', 'files.html')
+    return send_from_directory(".", "files.html")
 
 
-@app.route('/upload', methods=['POST'])
+@app.route("/upload", methods=["POST"])
 def upload():
-    f = request.files.get('file')
-    if not f or f.filename == '':
-        return jsonify({'safe': False, 'message': 'No file provided'}), 400
+    user_id = request.form.get("user_id")
+    if not user_id:
+        return jsonify({"safe": False, "message": "Missing user_id"}), 400
 
     try:
-        # Run both engines
-        clamav_result = scan_with_clamav(f.stream)
-        yara_result = scan_with_yara(f.stream)
+        user_id_int = int(user_id)
+    except:
+        return jsonify({"safe": False, "message": "user_id must be an integer"}), 400
 
-        threats = []
-        scan_results = []
+    files = request.files.getlist("file")
+    if not files:
+        return jsonify({"safe": False, "message": "No files provided"}), 400
 
-        # ClamAV
-        if clamav_result['safe'] is False:
-            threats.append(f"ClamAV: {clamav_result['threat']}")
-            scan_results.append({'engine': 'ClamAV', 'status': 'threat_detected',
-                                 'details': clamav_result['threat']})
-        elif clamav_result['safe'] is True:
-            scan_results.append({'engine': 'ClamAV', 'status': 'clean'})
-        else:
-            scan_results.append({'engine': 'ClamAV', 'status': 'error',
-                                 'error': clamav_result.get('error')})
+    valid_files = [f for f in files if f.filename and f.filename.strip()]
+    if not valid_files:
+        return jsonify({"safe": False, "message": "No valid files provided"}), 400
 
-        # YARA
-        if yara_result['safe'] is False:
-            for t in yara_result['threats']:
-                rule_name = t['rule']
-                desc = (t.get('meta') or {}).get('description', 'No description')
-                threats.append(f"YARA: {rule_name} - {desc}")
-            scan_results.append({'engine': 'YARA', 'status': 'threat_detected',
-                                 'details': yara_result['threats']})
-        elif yara_result['safe'] is True:
-            scan_results.append({'engine': 'YARA', 'status': 'clean'})
-        else:
-            scan_results.append({'engine': 'YARA', 'status': 'error',
-                                 'error': yara_result.get('error')})
+    source_ip = get_client_ip()
 
-        # Response
-        if threats:
-            return jsonify({
-                'safe': False,
-                'message': 'Threats detected!',
-                'threats': threats,
-                'scan_results': scan_results
-            })
+    try:
+        # Single
+        if len(valid_files) == 1:
+            scanned_at_dt = datetime.now(timezone.utc)
+            result = scan_single_file(valid_files[0])
+            scan_id = save_scan_to_db(user_id_int, result, scanned_at_dt, source_ip)
 
-        errors = [r for r in scan_results if r['status'] == 'error']
-        if errors:
-            return jsonify({
-                'safe': False,
-                'message': 'Scan completed with errors',
-                'scan_results': scan_results
-            }), 500
+            result["scan_id"] = scan_id
+            result["scanned_at"] = scanned_at_dt.isoformat()
 
-        return jsonify({
-            'safe': True,
-            'message': 'File is clean (scanned by ClamAV and YARA)',
-            'scan_results': scan_results
-        })
+            if result.get("error"):
+                return jsonify(result), 500
+            return jsonify(result)
+
+        # Multiple
+        results = []
+        for f in valid_files:
+            scanned_at_dt = datetime.now(timezone.utc)
+            r = scan_single_file(f)
+            scan_id = save_scan_to_db(user_id_int, r, scanned_at_dt, source_ip)
+
+            r["scan_id"] = scan_id
+            r["scanned_at"] = scanned_at_dt.isoformat()
+            results.append(r)
+
+        return jsonify(results)
 
     except Exception as e:
         traceback.print_exc()
-        return jsonify({'safe': False, 'message': f'Scan failed: {e}'}), 500
+        return jsonify({"safe": False, "message": f"Upload failed: {e}"}), 500
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+@app.route("/history", methods=["GET"])
+def history():
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Missing user_id"}), 400
+
+    try:
+        user_id_int = int(user_id)
+    except:
+        return jsonify({"error": "user_id must be an integer"}), 400
+
+    limit = request.args.get("limit", "200")
+    try:
+        limit = max(1, min(int(limit), 500))
+    except:
+        limit = 200
+
+    rows = get_history(user_id_int, limit)
+
+    results = []
+    for row in rows:
+        results.append(
+            {
+                "scan_id": str(row["id"]),
+                "user_id": row["user_id"],
+                "filename": row["filename"],
+                "size": row["size_bytes"],
+                "type": row["mime_type"],
+                "sha256": row.get("sha256"),
+                "safe": bool(row["safe"]),
+                "message": row["message"],
+                "threats": row.get("threats") or [],
+                "scan_results": row.get("scan_results") or [],
+                "source_ip": row.get("source_ip"),
+                "created_at": row["scanned_at"].isoformat() if row.get("scanned_at") else None,
+            }
+        )
+
+    return jsonify({"results": results})
+
+
+if __name__ == "__main__":
+    init_db_pool()
+    app.run(host="0.0.0.0", port=5000, debug=True)

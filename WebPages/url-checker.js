@@ -1,8 +1,10 @@
-import {//import api keys from config file
+//import api keys from config file
+import {
   GOOGLE_API_KEY,
   VIRUSTOTAL_API_KEY,
   CHECKPHISH_API_KEY,
 } from "./config.js";
+
 // Main logic
 document.addEventListener("DOMContentLoaded", () => {
   const urlButton   = document.getElementById("urlButton");
@@ -17,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     urlInputBox.style.display = isHidden ? "block" : "none";
     if (isHidden) urlInput.focus();
   });
+
 // Handle URL submissionubmitUrl
   submitUrl.addEventListener("click", async () => {
     const url = (urlInput.value || "").trim();
@@ -314,7 +317,6 @@ async function checkPhishStats(url) {
       disposition: found ? "phishing" : "clean",//disposition based on found or not
       brand: found ? (arr[0].target || "N/A") : "N/A",
       resolved: found,
-      // NEW: include full matching records so you can inspect all fields
       records: found ? arr : []
     };
   } catch (e) {

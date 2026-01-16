@@ -20,18 +20,25 @@
     </div>
   </nav>
 
-  <h1>Upload File for Virus Scan</h1>
+  <h1>Upload Files for Virus Scan</h1>
 
   <form id="uploadForm" enctype="multipart/form-data" class="panel">
-    <input type="file" name="file" id="fileInput" hidden />
+    <input type="file" id="fileInput" multiple hidden />
+    <input type="file" id="folderInput" webkitdirectory multiple hidden />
 
     <div id="dropzone"
          class="dropzone"
          role="button"
          tabindex="0"
-         aria-label="File upload dropzone. Press Enter to choose a file or drop a file here.">
-      <div>📄 Drop your file here</div>
-      <div class="hint">or click to choose a file</div>
+         aria-label="File upload dropzone. Press Enter to choose files, or use the Choose Folder button.">
+      <div>📁 Drop your files here</div>
+      <div class="hint">or choose files/folder</div>
+
+      <div class="row" style="gap:10px; justify-content:center; margin-top:10px;">
+        <button type="button" id="chooseFilesBtn" class="btn btn-ghost">Choose Files</button>
+        <button type="button" id="chooseFolderBtn" class="btn btn-ghost">Choose Folder</button>
+      </div>
+
       <div id="fileName" aria-live="polite"></div>
     </div>
 
@@ -42,6 +49,13 @@
   </form>
 
   <div id="result" class="panel" aria-live="polite" style="display:none;"></div>
+
+  <div id="navControls" class="row panel" style="display:none; align-items:center; justify-content:space-between; gap:10px;">
+    <button type="button" id="prevBtn" class="btn btn-ghost">Previous</button>
+    <div id="navLabel" class="muted" style="text-align:center; flex:1;"></div>
+    <button type="button" id="nextBtn" class="btn btn-ghost">Next</button>
+  </div>
+
   <div id="details" class="panel" style="display:none;"></div>
 </body>
 </html>
