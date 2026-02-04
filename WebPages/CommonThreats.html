@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Common Viruses</title>
+  <link rel="stylesheet" href="/CommonThreats.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <h2 class="logo">ThreatCheck</h2>
+    </div>
+    <div class="nav-right">
+      <a href="Home.html">Home</a>
+      <a href="Information.html">Information</a>
+      <a href="ScanHistory.html">Scan History</a>
+      <a href="CommonThreats.html">Common Threats</a>
+      <a href="logout.html" class="logout-btn">Log Out</a>
+    </div>
+  </nav>
+
+  <header class="topbar">
+    <div class="wrap">
+      <h1>Common Viruses</h1>
+      <p class="subtitle">Threats detected at least 10 times in the past 30  days</p>
+
+      <div class="controls">
+        <label>
+          Days
+          <input id="days" type="number" min="1" max="365" value="30" />
+        </label>
+        <label>
+          Min hits
+          <input id="minCount" type="number" min="1" value="10" />
+        </label>
+        <label>
+          Virus Name
+          <!-- FIX: id must match JS (virusName) -->
+          <input id="virusName" type="text" placeholder="Eicar-Signature" />
+        </label>
+        <button id="refreshBtn">Refresh</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid">
+    <section class="panel">
+      <h2>Most common threats</h2>
+      <div id="status" class="status">Loading…</div>
+      <ul id="threatList" class="list"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Threat details</h2>
+      <div id="detailsEmpty" class="empty">
+        Select a threat from the left to see information and recent scans.
+      </div>
+
+      <div id="details" class="details hidden">
+        <div class="detailsHead">
+          <div>
+            <div id="threatName" class="threatName"></div>
+            <div id="threatMeta" class="threatMeta"></div>
+          </div>
+          <div class="pill" id="threatHits"></div>
+        </div>
+
+        <div class="card">
+          <h3>Summary</h3>
+          <p id="summary"></p>
+        </div>
+
+        <div class="twoCol">
+          <div class="card">
+            <h3>How to avoid</h3>
+            <ul id="avoidList"></ul>
+          </div>
+          <div class="card">
+            <h3>How to get rid of it</h3>
+            <ul id="ridList"></ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Recent scans for this threat</h3>
+          <div class="hint">Showing up to 100 scans in the selected time window.</div>
+          <div class="tableWrap">
+            <table>
+             <thead>
+              <tr>
+                <th>Scanned at</th>
+                <th>SHA256</th>
+                <th>Safe</th>
+                <th>MIME type</th>
+              </tr>
+            </thead>
+            <tbody id="scanTbody"></tbody>
+
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/commonThreats.js"></script>
+</body>
+</html>
