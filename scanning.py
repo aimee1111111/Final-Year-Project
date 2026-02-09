@@ -5,6 +5,10 @@ import clamd
 import hashlib
 import traceback
 
+from hash_reputation import lookup_sha256_vt
+from hash_reputation_mb import lookup_sha256_malwarebazaar
+
+
 # ClamAV (expects a local clamd listening on 3310)
 cd = clamd.ClamdNetworkSocket(host="127.0.0.1", port=3310)
 
@@ -49,6 +53,24 @@ def scan_with_yara(data_bytes: bytes) -> dict:
         return {"safe": None, "engine": "YARA", "error": str(e)}
 
 
+def _worst_verdict(*verdicts: str) -> str:
+    """
+    Pick the worst verdict from a list.
+    Order: malicious > suspicious > clean > unknown > error
+    (You can swap error position if you want errors to "poison" the result.)
+    """
+    rank = {"malicious": 4, "suspicious": 3, "clean": 2, "unknown": 1, "error": 0}
+    best = "unknown"
+    best_score = -1
+    for v in verdicts:
+        if not v:
+            continue
+        score = rank.get(v, 1)
+        if score > best_score:
+            best, best_score = v, score
+    return best
+
+
 def scan_single_file(file_obj) -> dict:
     try:
         file_obj.stream.seek(0)
@@ -58,6 +80,7 @@ def scan_single_file(file_obj) -> dict:
         mime_type = file_obj.content_type or "application/octet-stream"
         sha256 = hashlib.sha256(file_data).hexdigest()
 
+        # local engines
         clamav_result = scan_with_clamav(file_data)
         yara_result = scan_with_yara(file_data)
 
@@ -85,8 +108,50 @@ def scan_single_file(file_obj) -> dict:
         else:
             scan_results.append({"engine": "YARA", "status": "error", "error": yara_result.get("error")})
 
+        # Hash reputation lookups
+        do_hash_lookup = True
+        if threats:
+            do_hash_lookup = True
+
+        vt_rep = lookup_sha256_vt(sha256) if do_hash_lookup else {"provider": "VirusTotal", "found": False, "verdict": "unknown"}
+        mb_rep = lookup_sha256_malwarebazaar(sha256) if do_hash_lookup else {"provider": "MalwareBazaar", "found": False, "verdict": "unknown"}
+
+        # Combine results
+        combined_verdict = _worst_verdict(vt_rep.get("verdict"), mb_rep.get("verdict"))
+
+        hash_rep = {
+            "sha256": sha256,
+            "verdict": combined_verdict,
+            "providers": {
+                "VirusTotal": vt_rep,
+                "MalwareBazaar": mb_rep,
+            }
+        }
+
+        # Add reputation results to scan_results + threats
+        if vt_rep.get("verdict") in ("malicious", "suspicious"):
+            threats.append(f"VirusTotal: {vt_rep.get('verdict')} (mal={vt_rep.get('malicious', 0)}, sus={vt_rep.get('suspicious', 0)})")
+            scan_results.append({"engine": "VirusTotal", "status": "threat_detected" if vt_rep.get("verdict") == "malicious" else "suspicious", "details": vt_rep})
+        elif vt_rep.get("verdict") == "clean":
+            scan_results.append({"engine": "VirusTotal", "status": "clean", "details": vt_rep})
+        elif vt_rep.get("verdict") == "unknown":
+            scan_results.append({"engine": "VirusTotal", "status": "unknown", "details": vt_rep})
+        else:
+            scan_results.append({"engine": "VirusTotal", "status": "error", "error": vt_rep.get("error")})
+
+        if mb_rep.get("verdict") in ("malicious", "suspicious"):
+            # MalwareBazaar “found” is basically malicious
+            threats.append(f"MalwareBazaar: {mb_rep.get('verdict')} (sig={mb_rep.get('signature')})")
+            scan_results.append({"engine": "MalwareBazaar", "status": "threat_detected" if mb_rep.get("verdict") == "malicious" else "suspicious", "details": mb_rep})
+        elif mb_rep.get("verdict") == "clean":
+            scan_results.append({"engine": "MalwareBazaar", "status": "clean", "details": mb_rep})
+        elif mb_rep.get("verdict") == "unknown":
+            scan_results.append({"engine": "MalwareBazaar", "status": "unknown", "details": mb_rep})
+        else:
+            scan_results.append({"engine": "MalwareBazaar", "status": "error", "error": mb_rep.get("error")})
+
         safe = len(threats) == 0
-        errors = [r for r in scan_results if r["status"] == "error"]
+        errors = [r for r in scan_results if r.get("status") == "error"]
 
         if threats:
             message = "Threats detected!"
@@ -101,7 +166,7 @@ def scan_single_file(file_obj) -> dict:
             "size_bytes": file_size,
             "mime_type": mime_type,
             "sha256": sha256,
-            # legacy fields
+            "hash_reputation": hash_rep,  # now includes both providers
             "size": file_size,
             "type": mime_type,
             "safe": safe,

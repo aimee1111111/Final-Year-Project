@@ -1,4 +1,5 @@
 (() => {
+  // Element references
   const form = document.getElementById('uploadForm');
   const fileInput = document.getElementById('fileInput');
   const folderInput = document.getElementById('folderInput');
@@ -10,7 +11,6 @@
   const chooseFilesBtn = document.getElementById('chooseFilesBtn');
   const chooseFolderBtn = document.getElementById('chooseFolderBtn');
 
-  // limits (change these)
   const MAX_FILE_BYTES = 10 * 1024 * 1024;      // 10 MB per file
   const MAX_TOTAL_BYTES = 50 * 1024 * 1024;     // 50 MB total per upload
 
@@ -78,10 +78,10 @@
     resetUI();
   }
 
-  // --------- selection UX ----------
+  // selection UX
   chooseFilesBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    e.stopPropagation(); // stop bubbling to dropzone click
+    e.stopPropagation();
     folderInput.value = '';
     currentFiles = [];
     currentMode = 'files';
@@ -90,7 +90,7 @@
 
   chooseFolderBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    e.stopPropagation(); // stop bubbling to dropzone click
+    e.stopPropagation();
     fileInput.value = '';
     currentFiles = [];
     currentMode = 'folder';
@@ -111,18 +111,14 @@
 
   // Dropzone = files only
   dropzone.addEventListener('click', (e) => {
-    // if user clicked a button (Choose Files/Folder/Clear), do nothing here
     if (e.target.closest('button')) return;
-
     folderInput.value = '';
     currentMode = 'files';
     fileInput.click();
   });
 
   dropzone.addEventListener('keydown', (e) => {
-    // only trigger when the dropzone itself is focused, not a button inside it
     if (e.target.closest('button')) return;
-
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       folderInput.value = '';
@@ -154,7 +150,7 @@
     setFiles(files, 'files');
   });
 
-  // --------- result parsing helpers ----------
+  // result parsing helpers
   function pickThreatList(obj) {
     if (!obj) return [];
     if (Array.isArray(obj.threats)) return obj.threats;
@@ -197,12 +193,8 @@
   function safeFlag(r) {
     if (typeof r?.safe === 'boolean') return r.safe;
     if (typeof r?.is_safe === 'boolean') return r.is_safe;
-
-    // If threats exist -> not safe
     const t = pickThreatList(r);
     if (t.length) return false;
-
-    // Unknown -> treat as not safe (your original behavior)
     return false;
   }
 
@@ -219,7 +211,7 @@
     return null;
   }
 
-  // --------- UI rendering ----------
+  // UI rendering
   function renderHeaderSingle(resultObj) {
     const safe = safeFlag(resultObj);
     const msg = resultObj?.message;
@@ -271,6 +263,31 @@
     `;
   }
 
+  function formatEngineDetail(engineName, detailObjOrString) {
+    if (!detailObjOrString) return '';
+
+    // special formatting for HashReputation
+    if (engineName === 'HashReputation' && typeof detailObjOrString === 'object') {
+      const p = detailObjOrString.provider || 'API';
+      const v = detailObjOrString.verdict || 'unknown';
+      const m = detailObjOrString.malicious ?? 0;
+      const s = detailObjOrString.suspicious ?? 0;
+      const h = detailObjOrString.harmless ?? 0;
+      const u = detailObjOrString.undetected ?? 0;
+      if (detailObjOrString.error) {
+        return `${p}: error: ${detailObjOrString.error}`;
+      }
+      return `${p}: verdict=${v}; malicious=${m}; suspicious=${s}; harmless=${h}; undetected=${u}`;
+    }
+
+    if (typeof detailObjOrString === 'string') return detailObjOrString;
+    if (Array.isArray(detailObjOrString)) {
+      return detailObjOrString.map(d => d.rule || d.name || JSON.stringify(d)).join('; ');
+    }
+    if (typeof detailObjOrString === 'object') return JSON.stringify(detailObjOrString);
+    return String(detailObjOrString);
+  }
+
   function buildDetailsRichHtml(resultObj, fileObjOrName) {
     const when = new Date().toLocaleString();
     const safe = safeFlag(resultObj);
@@ -291,6 +308,8 @@
       fname = filenameFromResult(resultObj, fname);
     }
 
+    const sha256 = resultObj?.sha256 || '';
+
     const threats = pickThreatList(resultObj);
     const threatList = threats.length
       ? `<ul>${threats.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>`
@@ -303,14 +322,7 @@
 
       let detail = '';
       if (r.details) {
-        if (typeof r.details === 'string') {
-          detail = r.details;
-        } else if (Array.isArray(r.details)) {
-          const rules = r.details.map(d => d.rule || d.name || JSON.stringify(d)).join('; ');
-          detail = rules;
-        } else if (typeof r.details === 'object') {
-          detail = JSON.stringify(r.details);
-        }
+        detail = formatEngineDetail(eng, r.details);
       } else if (r.error) {
         detail = `error: ${r.error}`;
       } else if (r.message) {
@@ -342,7 +354,9 @@
         <label>Size</label><input type="text" value="${escapeHtml(fsize)}" readonly />
         <label>Type</label><input type="text" value="${escapeHtml(ftype)}" readonly />
         <label>Scanned</label><input type="text" value="${escapeHtml(when)}" readonly />
+        <label>SHA-256</label><input type="text" value="${escapeHtml(sha256 || '—')}" readonly />
         <label>Verdict</label><input class="${verdictClass}" type="text" value="${escapeHtml(verdict)}" readonly />
+
         <div style="grid-column:1/-1; margin-top:8px;">
           <h3 style="margin:10px 0 4px;">Per-engine results</h3>
           ${enginesHTML || '<div class="muted">No engine data.</div>'}
@@ -433,7 +447,7 @@
     };
   }
 
-  // --------- upload ----------
+  // upload
   async function uploadCurrentFiles() {
     if (!currentMode) {
       alert('Choose files or a folder first.');
