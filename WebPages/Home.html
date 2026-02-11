@@ -7,12 +7,16 @@
   <link rel="stylesheet" href="Home.css" />
 </head>
 <body>
+  <div class="grid-bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
-  <nav class="navbar">
+  <div class="container">
+   <nav class="navbar">
     <div class="nav-left">
       <h2 class="logo">ThreatCheck</h2>
     </div>
-    <div class="nav-right">
+     <div class="nav-right">
       <a href="Home.html">Home</a>
       <a href="Information.html">Information</a>
       <a href="ScanHistory.html">Scan History</a>
@@ -21,67 +25,76 @@
     </div>
   </nav>
 
-  <div class="content">
-    <h1>Welcome to ThreatCheck</h1>
-    <p>You have successfully logged in.</p>
+    <div class="main-content">
+      <div class="hero-section">
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          Logged In Successfully
+        </div>
+        <h1>Welcome to ThreatCheck</h1>
+        <p class="subtitle">
+          Your security command center is ready. Scan files, analyze URLs, and monitor threats in real-time with advanced detection algorithms.
+        </p>
+      </div>
 
-    <div class="box-container">
-      <a href="files.html" class="box">
-        <img src="https://img.icons8.com/ios-filled/100/ffffff/file.png" alt="Files" />
-        <span>Files</span>
-      </a>
+      <div class="action-cards">
+        <a href="files.html" class="card">
+          <div class="card-icon">📄</div>
+          <h3>Scan Files</h3>
+          <p>Upload and analyze suspicious files with our multi-engine detection system. Supports all major file types.</p>
+          <span class="card-arrow">→</span>
+        </a>
 
-      <button id="urlButton" class="box" type="button">
-        <img src="https://img.icons8.com/ios-filled/100/ffffff/link.png" alt="URL" />
-        <span>URL</span>
-      </button>
-    </div>
+        <div class="card" id="urlButton" role="button" tabindex="0" aria-controls="urlInputBox" aria-expanded="false">
+          <div class="card-icon">🔗</div>
+          <h3>Check URL</h3>
+          <p>Investigate potentially malicious URLs and domains. Real-time threat intelligence from global databases.</p>
+          <span class="card-arrow">→</span>
+        </div>
 
-    <div id="urlInputBox" class="url-input-box hidden" aria-live="polite">
-      <label for="urlInput">Paste your link:</label>
-      <input type="url" id="urlInput" placeholder="Enter URL here" inputmode="url" />
-      <button id="submitUrl" type="button">Check Safety</button>
-      <p id="resultMessage"></p>
-    </div>
-  </div>
+        <div class="card" id="emailCard" role="button" tabindex="0" aria-controls="checkerPanel" aria-expanded="false">
+          <div class="card-icon">📧</div>
+          <h3>Check Email for phishing</h3>
+          <p>Verify emails for spam, phishing attempts, and breach data exposure.</p>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
 
-  <button class="checker-toggle" id="checkerToggle" type="button" aria-expanded="false" aria-controls="checkerPanel">
-    <span>🛡️</span>
-    <span>Check Email/Phone</span>
-  </button>
+      <div id="urlInputBox" class="url-input-box" style="display:none;">
+        <label for="urlInput">Paste your link:</label>
+        <input type="url" id="urlInput" placeholder="Enter URL here" inputmode="url" />
+        <button id="submitUrl" type="button">Check Safety</button>
+        <p id="resultMessage"></p>
+      </div>
 
-  <div class="checker-panel" id="checkerPanel" aria-live="polite" style="display:none">
+  <!-- Larger AI checker panel -->
+  <div class="checker-panel checker-panel--large" id="checkerPanel" style="display:none;">
     <div class="checker-header">
       <div class="checker-header-left">
         <div class="checker-icon">🔍</div>
         <div>
           <div class="checker-title">Phishing & Scam Detector</div>
-          <div class="checker-subtitle">Analyze emails & phone numbers</div>
+          <div class="checker-subtitle">Analyze email text and messages</div>
         </div>
       </div>
+      <button class="checker-close" id="checkerClose" type="button" aria-label="Close">✕</button>
     </div>
 
     <div class="checker-body" id="checkerBody">
       <div class="checker-msg bot">
-        👋 <strong>Paste an email or phone number</strong> below and I'll analyze it for phishing and scam indicators.
-        <br /><br />
-        I can detect:
-        <br />• Phishing emails and suspicious messages
-        <br />• Urgent/threatening language
-        <br /><br />
-        Paste your content below to get started!
+        👋 Paste suspicious email/message text and I’ll assess phishing risk, urgency language, impersonation clues, and social-engineering patterns.
       </div>
     </div>
 
     <div class="checker-input-area">
-      <label class="checker-label" for="checkerInput">Paste email content or text message:</label>
+      <label class="checker-label" for="checkerInput">Paste email content or message:</label>
       <textarea id="checkerInput" class="checker-textarea" placeholder="Example: Dear Customer, Your account has been suspended. Click here to verify..."></textarea>
-      <button id="checkerSend" class="checker-send" type="button">🔍 Analyze for Threats</button>
+      <button id="checkerSend" class="checker-send" type="button">Analyze for threats</button>
     </div>
   </div>
 
   <script type="module" src="url-checker.js"></script>
-
   <script src="checker.js" defer></script>
+  <script src="home.js" defer></script>
 </body>
 </html>
