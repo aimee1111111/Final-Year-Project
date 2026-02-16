@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ThreatCheck | Home</title>
   <link rel="stylesheet" href="Home.css" />
+  <link rel="stylesheet" href="urlChecker.css" />
+  <link rel="stylesheet" href="Aibot.css" />
 </head>
 <body>
   <div class="grid-bg"></div>
@@ -67,8 +69,8 @@
         <p id="resultMessage"></p>
       </div>
 
-  <!-- Larger AI checker panel -->
-  <div class="checker-panel checker-panel--large" id="checkerPanel" style="display:none;">
+  <!--AI checker panel -->
+  <div class="checker-panel" id="checkerPanel" style="display:none;">
     <div class="checker-header">
       <div class="checker-header-left">
         <div class="checker-icon">🔍</div>
@@ -89,11 +91,12 @@
     <div class="checker-input-area">
       <label class="checker-label" for="checkerInput">Paste email content or message:</label>
       <textarea id="checkerInput" class="checker-textarea" placeholder="Example: Dear Customer, Your account has been suspended. Click here to verify..."></textarea>
-      <button id="checkerSend" class="checker-send" type="button">Analyze for threats</button>
+      <button id="checkerSend" class="checker-send" type="button">🔍 Analyze for Threats</button>
     </div>
   </div>
 
   <script type="module" src="url-checker.js"></script>
+  
   <script src="checker.js" defer></script>
   <script src="home.js" defer></script>
 </body>

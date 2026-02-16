@@ -1,0 +1,329 @@
+/* Email Checker Panel */
+.checker-panel {
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    width: 450px;
+    max-width: calc(100vw - 4rem);
+    max-height: 75vh;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(240, 147, 251, 0.3);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 9999;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    animation: slideInPanel 0.4s ease-out;
+}
+
+@keyframes slideInPanel {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.checker-header {
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #006aff 0%, #f5576c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.checker-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.checker-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.checker-title {
+    font-weight: 700;
+    font-size: 17px;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.checker-subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 3px;
+}
+
+.checker-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.checker-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.checker-body {
+    padding: 18px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    gap: 14px;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: #0055ff var(--bg-primary);
+    background: #1a1f26;
+}
+
+.checker-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.checker-body::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+.checker-body::-webkit-scrollbar-thumb {
+    background: #0055ff;
+    border-radius: 3px;
+}
+
+.checker-msg {
+    padding: 14px 16px;
+    border-radius: 16px;
+    line-height: 1.5;
+    font-size: 14px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.checker-msg.bot {
+    background: #252d38;
+    border: 1px solid #3a4555;
+    align-self: flex-start;
+    border-bottom-left-radius: 6px;
+    max-width: 95%;
+}
+
+.checker-msg.analysis {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    max-width: 95%;
+    border-bottom-right-radius: 6px;
+}
+
+.checker-msg.thinking {
+    background: #252d38;
+    align-self: flex-start;
+    padding: 14px 20px;
+}
+
+.thinking-dots {
+    display: inline-flex;
+    gap: 5px;
+}
+
+.thinking-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f093fb;
+    animation: bounce 1.4s infinite ease-in-out;
+}
+
+.thinking-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.thinking-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+.checker-input-area {
+    padding: 14px 16px;
+    background: var(--bg-primary);
+    border-top: 1px solid #3a4555;
+}
+
+.checker-label {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 500;
+}
+
+.checker-textarea {
+    width: calc(100% - 28px);
+    background: #1a1f26;
+    border: 1px solid #3a4555;
+    border-radius: 12px;
+    color: #e5e7eb;
+    padding: 12px 14px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+    resize: vertical;
+    min-height: 80px;
+    max-height: 150px;
+}
+
+.checker-textarea:focus {
+    border-color: #008cff;
+}
+
+.checker-textarea::placeholder {
+    color: #6b7280;
+}
+
+.checker-send {
+    background: linear-gradient(135deg, #008cff 0%, #005eff 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 14px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.checker-send:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 255, 200, 0.4);
+}
+
+.checker-send:disabled {
+    background: #374151;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.checker-examples {
+    font-size: 12px;
+    color: #9ca3af;
+    padding: 10px 14px;
+    background: #252d38;
+    border-radius: 10px;
+    margin: 4px 0;
+    border: 1px solid #3a4555;
+}
+
+.checker-example-btn {
+    display: inline-block;
+    background: #1a1f26;
+    color: #9ca3af;
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin: 6px 6px 0 0;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid #3a4555;
+    transition: all 0.2s;
+}
+
+.checker-example-btn:hover {
+    background: #2d3748;
+    color: #e5e7eb;
+    border-color: #f093fb;
+}
+
+.fb-bar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.fb-btn {
+    border: 0;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.fb-btn.phish {
+    background: #ffe5e5;
+}
+
+.fb-btn.legit {
+    background: #e7ffe7;
+}
+
+.fb-status {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+@media (max-width: 968px) {
+    .main-content {
+        grid-template-columns: 1fr;}
+
+    h1 {
+        font-size: 2.5rem;}
+
+    nav {
+        padding: 1rem 1.5rem;}
+
+    .nav-links {
+        gap: 1.5rem;}
+
+    .stats-bar {
+        grid-template-columns: 1fr 1fr;}
+
+    .checker-panel {
+        right: 1rem;
+        bottom: 1rem;
+        width: calc(100vw - 2rem);}
+}

@@ -17,18 +17,22 @@ rule SuspiciousExecutable {
 
 // Script-based Threat Detection Rules 
 //used for JavaScript, Python, PHP, or mixed text with suspicious patterns.
-rule SuspiciousScript {
+rule SuspiciousScript
+{
     meta:
-        description = "Detects potentially malicious script patterns"
-        author = "Threat Check"
+        description = "Detect suspicious script patterns with weighted logic"
         severity = "medium"
     strings:
-        $eval = "eval(" nocase           // Dynamic code execution
-        $exec = "exec(" nocase           // Another way to execute code
-        $shell = /cmd\.exe|powershell|\/bin\/sh|\/bin\/bash/ nocase  // Shell invocation
-        $encode = "base64" nocase        // Often used to hide malicious payloads
+        $eval = "eval(" nocase ascii wide
+        $exec = "exec(" nocase ascii wide
+        $shell = /cmd\.exe|powershell|\/bin\/sh|\/bin\/bash/ nocase ascii wide
+        $encode = "base64" nocase ascii wide
+        $atob = "atob(" nocase ascii wide
+        $fromcc = "fromCharCode(" nocase ascii wide
     condition:
-        2 of them  // Flags file if at least two suspicious script behaviors are present
+        ($eval and $atob) or
+        ($shell and $encode) or
+        (3 of ($eval,$exec,$shell,$encode,$fromcc,$atob))
 }
 
 // Office Document with Macros 
@@ -82,22 +86,6 @@ rule SQLInjectionPattern {
         any of them  // Match any known SQLi signature
 }
 
-//Embedded Executable in Document
-//used for Detecting executables hidden within document files.
-rule EmbeddedExecutable {
-    meta:
-        description = "Detects executables embedded in documents"
-        author = "Threat Check"
-        severity = "high"
-    strings:
-        $doc_zip = { 50 4B 03 04 }  // ZIP header (used by docx/xlsx)
-        $mz = "MZ"                  // Executable header
-        $pe = "PE"                  // PE signature
-    condition:
-        $doc_zip at 0 and ($mz or $pe)
-        // Detects when an Office/OpenXML doc contains an embedded executable
-}
-
 //Suspicious Batch File 
 //used for Flagging potentially malicious batch scripts.
 rule SuspiciousBatchScript {
@@ -106,7 +94,7 @@ rule SuspiciousBatchScript {
         author = "Threat Check"
         severity = "medium"
     strings:
-        $echo_off = "@echo off" nocase     // Common in batch scripts. used to hide commands
+        $echo_off = "@echo off" nocase     // Common in batch scripts
         $del = /del\s+\/f\s+\/q/ nocase    // Forced file deletion
         $reg = "reg add" nocase            // Registry modification
         $schtasks = "schtasks" nocase      // Task scheduling persistence

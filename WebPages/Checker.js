@@ -1,36 +1,59 @@
 (() => {
-  'use strict';
+  "use strict";
 
-  // Use env/config in production; localhost is fine for dev.
-  const API_BASE = 'http://localhost:5050'; // Flask host/port
+  const API_BASE = "http://localhost:5050";
 
-  // Cache DOM
-  const toggle = document.getElementById('checkerToggle');
-  const panel  = document.getElementById('checkerPanel');
-  const body   = document.getElementById('checkerBody');
-  const input  = document.getElementById('checkerInput');
-  const send   = document.getElementById('checkerSend');
+  const emailCard = document.getElementById("emailCard");
+  const panel = document.getElementById("checkerPanel");
+  const closeBtn = document.getElementById("checkerClose");
+  const bodyEl = document.getElementById("checkerBody");
+  const input = document.getElementById("checkerInput");
+  const sendBtn = document.getElementById("checkerSend");
 
-  // Keep the exact last analyzed text for feedback
-  let lastAnalyzedText = '';
+  let lastAnalyzedText = "";
 
-  function scrollToBottom() {
-    body.scrollTop = body.scrollHeight;
+  function ensureElements() {
+    const ok = !!(emailCard && panel && closeBtn && bodyEl && input && sendBtn);
+    if (!ok) {
+      console.error("Checker init failed: missing one or more required elements.", {
+        emailCard: !!emailCard,
+        panel: !!panel,
+        closeBtn: !!closeBtn,
+        bodyEl: !!bodyEl,
+        input: !!input,
+        sendBtn: !!sendBtn
+      });
+    }
+    return ok;
   }
 
-  function appendMsg(text, type = 'bot') {
-    const wrap = document.createElement('div');
+  function scrollToBottom() {
+    bodyEl.scrollTop = bodyEl.scrollHeight;
+  }
+
+  function appendMsg(text, type = "bot") {
+    const wrap = document.createElement("div");
     wrap.className = `checker-msg ${type}`;
     wrap.textContent = text;
-    body.appendChild(wrap);
+    bodyEl.appendChild(wrap);
     scrollToBottom();
     return wrap;
   }
 
-  // Adds feedback controls under an analysis bubble
+  function openPanel() {
+    panel.style.display = "flex";
+    emailCard.setAttribute("aria-expanded", "true");
+    input.focus();
+  }
+
+  function closePanel() {
+    panel.style.display = "none";
+    emailCard.setAttribute("aria-expanded", "false");
+  }
+
   function attachFeedbackBar(container) {
-    const bar = document.createElement('div');
-    bar.className = 'fb-bar';
+    const bar = document.createElement("div");
+    bar.className = "fb-bar";
     bar.innerHTML = `
       <button class="fb-btn phish" data-label="1" type="button">⚠️ Mark as phishing</button>
       <button class="fb-btn legit" data-label="0" type="button">✅ Mark as legit</button>
@@ -38,138 +61,132 @@
     `;
     container.appendChild(bar);
 
-    const btns = bar.querySelectorAll('.fb-btn');
-    const status = bar.querySelector('.fb-status');
+    const buttons = bar.querySelectorAll(".fb-btn");
+    const status = bar.querySelector(".fb-status");
 
-    btns.forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const label = Number(btn.getAttribute('data-label'));
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const label = Number(btn.getAttribute("data-label"));
         if (!lastAnalyzedText) return;
-        btns.forEach(b => (b.disabled = true));
-        status.textContent = 'Sending feedback…';
+
+        buttons.forEach((b) => (b.disabled = true));
+        status.textContent = "Sending feedback…";
 
         try {
           const res = await fetch(`${API_BASE}/feedback`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text: lastAnalyzedText, label })
           });
 
-          const ct = res.headers.get('content-type') || '';
+          const ct = res.headers.get("content-type") || "";
           let data = null;
-          let raw = null;
+          let raw = "";
 
-          if (ct.includes('application/json')) {
-            data = await res.json();
-          } else {
-            raw = await res.text();
-          }
+          if (ct.includes("application/json")) data = await res.json();
+          else raw = await res.text();
 
           if (!res.ok) {
             const msg =
               (data && (data.error || data.message)) ||
-              (raw
-                ? `HTTP ${res.status} ${res.statusText}: ${raw.slice(0, 200)}`
-                : `HTTP ${res.status} ${res.statusText}`);
+              (raw ? `HTTP ${res.status} ${res.statusText}: ${raw.slice(0, 200)}` : `HTTP ${res.status} ${res.statusText}`);
             throw new Error(msg);
           }
 
-          status.textContent = 'Thanks — model updated!';
-        } catch (e) {
-          status.textContent = 'Feedback failed: ' + e.message;
-          btns.forEach(b => (b.disabled = false));
-          // Keep errors in console for debugging
-          console.error('Feedback error:', e);
+          status.textContent = "Thanks — model updated!";
+        } catch (err) {
+          console.error("Feedback error:", err);
+          status.textContent = `Feedback failed: ${err.message}`;
+          buttons.forEach((b) => (b.disabled = false));
         }
       });
     });
   }
 
   async function analyzeContent(content) {
-    if (!content.trim()) return;
+    const text = (content || "").trim();
+    if (!text) return;
 
-    input.value = '';
-    send.disabled = true;
+    input.value = "";
+    sendBtn.disabled = true;
 
-    const thinking = document.createElement('div');
-    thinking.className = 'checker-msg thinking';
+    const thinking = document.createElement("div");
+    thinking.className = "checker-msg thinking";
     thinking.innerHTML = '🔍 Analyzing... <div class="thinking-dots"><span></span><span></span><span></span></div>';
-    body.appendChild(thinking);
+    bodyEl.appendChild(thinking);
     scrollToBottom();
 
     try {
       const res = await fetch(`${API_BASE}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: content })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
       });
 
       thinking.remove();
 
-      const ct = res.headers.get('content-type') || '';
+      const ct = res.headers.get("content-type") || "";
       let data = null;
-      let raw = null;
+      let raw = "";
 
-      if (ct.includes('application/json')) {
-        data = await res.json();
-      } else {
-        raw = await res.text();
-      }
+      if (ct.includes("application/json")) data = await res.json();
+      else raw = await res.text();
 
       if (!res.ok) {
         const msg =
           (data && (data.error || data.message)) ||
           (raw ? `HTTP ${res.status} ${res.statusText}: ${raw.slice(0, 200)}` : `HTTP ${res.status} ${res.statusText}`);
-        appendMsg(`❌ Error: ${msg}`, 'bot');
+        appendMsg(`❌ Error: ${msg}`, "bot");
         return;
       }
 
-      const replyText = (data && data.reply) || 'No analysis available.';
-      const bubble = appendMsg(replyText, 'analysis');
+      const replyText = (data && data.reply) || "No analysis available.";
+      const bubble = appendMsg(replyText, "analysis");
 
-      // Remember the exact analyzed input for feedback
-      lastAnalyzedText = content;
-
-      // Attach feedback UI under this specific analysis bubble
+      lastAnalyzedText = text;
       attachFeedbackBar(bubble);
-    } catch (e) {
+    } catch (err) {
       thinking.remove();
-      console.error('Analysis error:', e);
-      appendMsg('❌ Unable to connect to analysis service. Make sure the Flask server is running on port 5050.', 'bot');
+      console.error("Analysis error:", err);
+      appendMsg("❌ Unable to connect to analysis service. Ensure Flask is running on port 5050 and CORS is enabled.", "bot");
     } finally {
-      send.disabled = false;
+      sendBtn.disabled = false;
     }
   }
 
-  // Wire up interactions
-  function initEvents() {
-    if (!toggle || !panel || !input || !send) return;
+  function init() {
+    if (!ensureElements()) return;
 
-    toggle.addEventListener('click', () => {
-      const isVisible = panel.style.display === 'flex';
-      panel.style.display = isVisible ? 'none' : 'flex';
-      toggle.setAttribute('aria-expanded', String(!isVisible));
-      if (!isVisible) input.focus();
-    });
-
-    send.addEventListener('click', () => {
-      const content = (input.value || '').trim();
-      if (content) analyzeContent(content);
-    });
-
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && e.ctrlKey) {
+    // Open panel from card
+    emailCard.addEventListener("click", openPanel);
+    emailCard.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        const content = (input.value || '').trim();
-        if (content) analyzeContent(content);
+        openPanel();
+      }
+    });
+
+    // Close panel
+    closeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closePanel();
+    });
+
+    // Send analysis
+    sendBtn.addEventListener("click", () => analyzeContent(input.value));
+
+    // Ctrl+Enter submit
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.ctrlKey) {
+        e.preventDefault();
+        analyzeContent(input.value);
       }
     });
   }
 
-  // Initialize when DOM is ready 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initEvents);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    initEvents();
+    init();
   }
 })();
