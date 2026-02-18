@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Advice Board</title>
+    <link rel="stylesheet" href="posts.css" />
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="nav-left">
+        <h2 class="logo">ThreatCheck</h2>
+      </div>
+
+      <div class="nav-right">
+        <a href="Home.html">Home</a>
+        <a href="Information.html">Information</a>
+        <a href="ScanHistory.html">Scan History</a>
+        <a href="posts.html" aria-current="page">Posts</a>
+        <a href="CommonThreats.html">Common Threats</a>
+        <a href="logout.html" class="logout-btn">Log Out</a>
+      </div>
+    </nav>
+
+    <header class="page-header">
+      <div class="header-text">
+        <div class="title">Advice Board</div>
+        <div class="subtitle">Ask questions, share advice, discuss threats safely</div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <button id="tabAll" class="tab active" type="button">All Posts</button>
+        <button id="tabMine" class="tab" type="button">My Posts</button>
+        <button id="tabNew" class="tab" type="button">Create Post</button>
+      </aside>
+
+      <section class="content">
+        <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+        <div id="viewList" class="panel">
+          <div class="panelhead">
+            <h2 id="listTitle">All Posts</h2>
+
+            <div class="spacer"></div>
+
+            <div class="searchbar">
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Search title or post text…"
+                aria-label="Search posts"
+              />
+              <button id="searchBtn" class="btn ghost" type="button">Search</button>
+              <button id="clearSearch" class="btn ghost" type="button">Clear</button>
+            </div>
+
+            <button id="refreshList" class="btn ghost" type="button">Refresh</button>
+          </div>
+
+          <div id="posts" class="posts"></div>
+        </div>
+
+        <div id="viewNew" class="panel hidden">
+          <div class="panelhead">
+            <h2>Create a Post</h2>
+          </div>
+
+          <form id="newPostForm" class="form">
+            <label for="newTitle">Title</label>
+            <input
+              id="newTitle"
+              type="text"
+              maxlength="140"
+              placeholder="Short summary"
+            />
+
+            <label for="newBody">Post text</label>
+            <textarea
+              id="newBody"
+              rows="10"
+              placeholder="Describe the threat / question and what you’ve tried"
+            ></textarea>
+
+            <div class="row">
+              <button type="submit" class="btn primary">Publish</button>
+              <button type="button" id="cancelNew" class="btn ghost">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="viewDetail" class="panel hidden">
+          <div class="panelhead">
+            <button id="backToList" class="btn ghost" type="button">← Back</button>
+            <div class="spacer"></div>
+            <button id="refreshDetail" class="btn ghost" type="button">Refresh</button>
+          </div>
+
+          <article class="postdetail">
+            <h2 id="detailTitle"></h2>
+            <div id="detailMeta" class="meta"></div>
+            <div id="detailBody" class="body"></div>
+          </article>
+
+          <section class="replies">
+            <h3>Replies</h3>
+            <div id="replyList" class="replylist"></div>
+
+            <form id="replyForm" class="form">
+              <label for="replyBody">Reply</label>
+              <textarea
+                id="replyBody"
+                rows="4"
+                placeholder="Be helpful, specific, and safe"
+              ></textarea>
+              <button type="submit" class="btn primary">Send Reply</button>
+            </form>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="posts.js"></script>
+  </body>
+</html>

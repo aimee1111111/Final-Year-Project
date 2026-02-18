@@ -10,9 +10,11 @@ from commonvirus_db import (
     get_common_threats,
     get_threat_recent_scans,
 )
+from forum_routes import forum_bp 
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
+app.register_blueprint(forum_bp)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB
 
 

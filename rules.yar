@@ -208,3 +208,35 @@ rule EmbeddedSuspiciousVBA {
         $vba and 2 of ($createobject, $shell, $download)
         // Detects malicious macros creating shell objects or downloading files
 }
+
+rule DangerousPythonDynamicExecution
+{
+    meta:
+        description = "Detects Python dynamic execution via eval/exec (often malicious, but can be abused)"
+        author = "Threat Check"
+        severity = "high"
+    strings:
+        $py_print = "print(" nocase ascii wide
+        $py_eval  = "eval("  nocase ascii wide
+        $py_exec  = "exec("  nocase ascii wide
+        $py_data  = "data"   nocase ascii wide
+    condition:
+        // Strong match for patterns like:
+        // data = "..."; eval(data); exec("...")
+        ( $py_eval and $py_exec ) or
+        ( $py_data and $py_eval ) or
+        ( $py_exec and $py_print )
+}
+rule PythonEvalExecDemoPattern
+{
+    meta:
+        description = "Flags demo/test scripts using eval(data) and exec()"
+        author = "Threat Check"
+        severity = "medium"
+    strings:
+        $assign = /data\s*=\s*["'][^"']+["']/ nocase ascii
+        $evald  = "eval(data)" nocase ascii wide
+        $execp  = /exec\(\s*["']print\(/ nocase ascii
+    condition:
+        $assign and $evald and $execp
+}
