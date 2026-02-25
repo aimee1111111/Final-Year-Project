@@ -155,7 +155,7 @@
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/history?user_id=${encodeURIComponent(userId)}&limit=200`);
+      const res = await fetch(`http://localhost:5001/history?user_id=${encodeURIComponent(userId)}&limit=200`);
       const ct = res.headers.get('content-type') || '';
       if (!ct.includes('application/json')) {
         const text = await res.text();

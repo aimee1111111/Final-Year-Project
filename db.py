@@ -57,8 +57,6 @@ def save_scan_to_db(user_id: int, result: dict, scanned_at_dt: datetime, source_
     threats = result.get("threats", [])
     scan_results = result.get("scan_results", [])
 
-    created_at_dt = datetime.now(timezone.utc)
-
     conn = None
     try:
         conn = db_get_conn()
@@ -67,12 +65,10 @@ def save_scan_to_db(user_id: int, result: dict, scanned_at_dt: datetime, source_
                 """
                 INSERT INTO scans (
                     user_id, filename, size_bytes, mime_type, sha256, scanned_at,
-                    safe, message, threats, scan_results, source_ip,
-                    size, type, threats_json, scan_results_json, created_at
+                    safe, message, threats, scan_results, source_ip
                 )
                 VALUES (
                     %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s
                 )
                 RETURNING id
@@ -89,21 +85,18 @@ def save_scan_to_db(user_id: int, result: dict, scanned_at_dt: datetime, source_
                     Json(threats),
                     Json(scan_results),
                     source_ip,
-                    # legacy duplicates (remove if those cols don't exist)
-                    result.get("size"),
-                    result.get("type"),
-                    Json(threats),
-                    Json(scan_results),
-                    created_at_dt,
                 ),
             )
             scan_id = cur.fetchone()[0]
         conn.commit()
         return str(scan_id)
+    except Exception:
+        if conn:
+            conn.rollback()
+        raise
     finally:
         if conn:
             db_put_conn(conn)
-
 
 def get_history(user_id_int: int, limit: int = 200):
     conn = None

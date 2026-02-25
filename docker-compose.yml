@@ -1,21 +1,94 @@
-version: "3.9"
 services:
-  clamav:
-    image: clamav/clamav:stable
-    restart: unless-stopped
-    ports:
-      - "3310:3310"   # optional; only needed if scanning from host
-    volumes:
-      - clamdb:/var/lib/clamav
-
   web:
-    build: .
-    restart: unless-stopped
-    depends_on:
-      - clamav
+    build: .                    # Build the Flask “web” image from the Dockerfile in this folder
+    container_name: web         # The container will be named "web"
+    ports:
+      - "5001:5000"             # Host port 5001 -> container port 5000 
+
     environment:
-      CLAMAV_HOST: clamav
-      CLAMAV_PORT: "3310"
+      # Tells Flask app where to find ClamAV 
+      CLAMD_HOST: clamav
+      CLAMD_PORT: "3310"
+
+      # Tells Flask app where to find the YARA scanning API
+      YARA_SERVICE_URL: http://yara:8000
+
+      # Postgres connection details (Flask container -> Postgres container)
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: my_database
+      PGUSER: postgres
+      PGPASSWORD: "1Partner!"
+
+    depends_on:
+      # This means Docker starts these first, and also wait for healthchecks to pass
+      postgres:
+        condition: service_healthy
+      clamav:
+        condition: service_healthy
+      yara:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16        
+    container_name: postgres
+    environment:
+      # Creates the DB + user on first run 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1Partner!"
+      POSTGRES_DB: my_database
+
+    ports:
+      - "5433:5432"             # Host port 5433 -> container port 5432
+                                # Inside Docker, other containers still use postgres:5432
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Saves the database data so it persists after restart
+
+    healthcheck:
+      # Checks if Postgres is ready to accept connections
+      test: ["CMD-SHELL", "pg_isready -U postgres -d my_database"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+
+  clamav:
+    image: clamav/clamav:latest  # ClamAV daemon container (clamd)
+    container_name: clamav
+    ports:
+      - "3310:3310"              # Host port 3310 -> container port 3310
+                                 # The web container can reach it internally via clamav:3310
+
+    healthcheck:
+      # Checks if clamd is listening on port 3310 inside the container
+      test: ["CMD-SHELL", "nc -z localhost 3310"]
+      interval: 5s
+      timeout: 2s
+      retries: 60
+
+  yara:
+    build:
+      context: .                 # Build using files from the project root
+      dockerfile: sandbox/Dockerfile  # Use this Dockerfile for the YARA API service
+    container_name: yara
+
+    expose:
+      - "8000"                   # Exposes port 8000 to other containers on the Docker network
+
+    environment:
+      # Where the YARA rules file is inside the container
+      YARA_RULES_PATH: /app/rules.yar
+
+    healthcheck:
+      # Calls the YARA service /health endpoint to make sure it's running
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()\"",
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 60
 
 volumes:
-  clamdb:
+  pgdata: 

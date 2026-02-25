@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from datetime import datetime, timezone
+import os
 import traceback
 
 from scanning import scan_single_file
@@ -10,12 +11,15 @@ from commonvirus_db import (
     get_common_threats,
     get_threat_recent_scans,
 )
-from forum_routes import forum_bp 
+from forum_routes import forum_bp
 
-app = Flask(__name__, static_folder='.', static_url_path='')
-CORS(app)
+app = Flask(__name__, static_folder=".", static_url_path="")
+CORS(
+    app,
+    resources={r"/*": {"origins": ["http://localhost:4000","http://localhost:5001", "http://127.0.0.1:4000"]}},
+)
 app.register_blueprint(forum_bp)
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB
+app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50 MB
 
 
 def get_client_ip():
@@ -25,7 +29,40 @@ def get_client_ip():
     return request.remote_addr or ""
 
 
-@app.route("/")
+# Init pools once (avoid double init under debug reloader)
+_pools_inited = False
+
+def init_pools_once():
+    global _pools_inited
+    if _pools_inited:
+        return
+    _pools_inited = True
+
+    try:
+        init_db_pool()
+    except Exception as e:
+        print(f"[DB] init_db_pool failed: {e}")
+        traceback.print_exc()
+
+    try:
+        init_commonvirus_db_pool()
+    except Exception as e:
+        print(f"[DB] init_commonvirus_db_pool failed: {e}")
+        traceback.print_exc()
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify(
+        {
+            "status": "ok",
+            "clamd_host": os.environ.get("CLAMD_HOST", "localhost"),
+            "clamd_port": os.environ.get("CLAMD_PORT", "3310"),
+        }
+    )
+
+
+@app.route("/", methods=["GET"])
 def root():
     return send_from_directory(".", "files.html")
 
@@ -56,7 +93,16 @@ def upload():
         if len(valid_files) == 1:
             scanned_at_dt = datetime.now(timezone.utc)
             result = scan_single_file(valid_files[0])
-            scan_id = save_scan_to_db(user_id_int, result, scanned_at_dt, source_ip)
+
+            scan_id = None
+            try:
+                scan_id = save_scan_to_db(user_id_int, result, scanned_at_dt, source_ip)
+            except Exception as db_e:
+                print(f"[DB] save_scan_to_db failed: {db_e}")
+                traceback.print_exc()
+                result.setdefault("scan_results", []).append(
+                    {"engine": "DB", "status": "error", "error": str(db_e)}
+                )
 
             result["scan_id"] = scan_id
             result["scanned_at"] = scanned_at_dt.isoformat()
@@ -70,7 +116,16 @@ def upload():
         for f in valid_files:
             scanned_at_dt = datetime.now(timezone.utc)
             r = scan_single_file(f)
-            scan_id = save_scan_to_db(user_id_int, r, scanned_at_dt, source_ip)
+
+            scan_id = None
+            try:
+                scan_id = save_scan_to_db(user_id_int, r, scanned_at_dt, source_ip)
+            except Exception as db_e:
+                print(f"[DB] save_scan_to_db failed: {db_e}")
+                traceback.print_exc()
+                r.setdefault("scan_results", []).append(
+                    {"engine": "DB", "status": "error", "error": str(db_e)}
+                )
 
             r["scan_id"] = scan_id
             r["scanned_at"] = scanned_at_dt.isoformat()
@@ -123,8 +178,6 @@ def history():
 
     return jsonify({"results": results})
 
-
-#Common virus APIs
 
 @app.route("/api/common-viruses", methods=["GET"])
 def api_common_viruses():
@@ -230,7 +283,7 @@ def api_virus_scans():
     return jsonify({"name": name, "days": days_i, "items": items})
 
 
+
 if __name__ == "__main__":
-    init_db_pool()
-    init_commonvirus_db_pool()
+    init_pools_once()
     app.run(host="0.0.0.0", port=5000, debug=True)

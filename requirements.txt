@@ -1,2 +1,8 @@
 scikit-learn==1.5.2
 joblib==1.4.2
+flask
+flask-cors
+requests
+clamd
+python-dotenv==1.0.1
+psycopg2-binary==2.9.9

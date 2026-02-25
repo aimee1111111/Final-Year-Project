@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:5000";
+const API_BASE = "http://localhost:5001";
 
 const els = {
   days: document.getElementById("days"),
@@ -85,7 +85,7 @@ async function loadCommonThreats() {
   clearChildren(els.threatList);
 
   const p = qsParams();
-  const res = await fetch(`${API_BASE}/api/common-viruses?${p.toString()}`);
+const res = await fetch(`${API_BASE}/api/common-viruses?${p.toString()}`);
 
   if (!res.ok) {
     setStatus(`Error loading list: ${res.status}`);
@@ -149,7 +149,7 @@ async function selectThreat(item, liEl) {
   if (!scansRes.ok) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
-    td.colSpan = 6;
+    td.colSpan = 4;
     td.textContent = `Error loading scans: ${scansRes.status}`;
     tr.appendChild(td);
     els.scanTbody.appendChild(tr);
@@ -170,29 +170,28 @@ async function selectThreat(item, liEl) {
   }
 
   for (const s of scans) {
-  const tr = document.createElement("tr");
+    const tr = document.createElement("tr");
 
-  const tdAt = document.createElement("td");
-  tdAt.textContent = fmtDate(s.scanned_at);
+    const tdAt = document.createElement("td");
+    tdAt.textContent = fmtDate(s.scanned_at);
 
-  const tdSha = document.createElement("td");
-  tdSha.textContent = s.sha256 ?? "";
+    const tdSha = document.createElement("td");
+    tdSha.textContent = s.sha256 ?? "";
 
-  const tdSafe = document.createElement("td");
-  tdSafe.textContent = String(s.safe);
+    const tdSafe = document.createElement("td");
+    tdSafe.textContent = String(s.safe);
 
-  const tdMime = document.createElement("td");
-  tdMime.textContent = s.mime_type ?? "";
+    const tdMime = document.createElement("td");
+    tdMime.textContent = s.mime_type ?? "";
 
-  tr.appendChild(tdAt);
-  tr.appendChild(tdSha);
-  tr.appendChild(tdSafe);
-  tr.appendChild(tdMime);
+    tr.appendChild(tdAt);
+    tr.appendChild(tdSha);
+    tr.appendChild(tdSafe);
+    tr.appendChild(tdMime);
 
-  els.scanTbody.appendChild(tr);
+    els.scanTbody.appendChild(tr);
+  }
 }
-}
-
 
 els.refreshBtn.addEventListener("click", () => {
   loadCommonThreats().catch((err) => setStatus(`Error: ${err.message}`));

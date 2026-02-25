@@ -70,7 +70,7 @@ def get_common_threats(
                   ELSE NULL
                 END AS threat_name
               FROM scans s
-              LEFT JOIN LATERAL jsonb_array_elements(COALESCE(s.threats_json, '[]'::jsonb)) AS elem ON TRUE
+              LEFT JOIN LATERAL jsonb_array_elements(COALESCE(s.threats, '[]'::jsonb)) AS elem ON TRUE
               WHERE s.scanned_at >= (now() AT TIME ZONE 'utc') - (%s || ' days')::interval
                 AND (%s IS NULL OR s.user_id = %s)
             )
@@ -96,7 +96,7 @@ def get_common_threats(
 def get_threat_recent_scans(
     threat_name: str,
     days: int = 30,
-    user_id: Optional[int] = None,  # kept for compatibility; not used in query below
+    user_id: Optional[int] = None,
     limit: int = 100,
 ) -> List[Dict[str, Any]]:
     conn = None
@@ -121,7 +121,7 @@ def get_threat_recent_scans(
                   ELSE NULL
                 END AS threat_name
               FROM scans s
-              LEFT JOIN LATERAL jsonb_array_elements(COALESCE(s.threats_json, '[]'::jsonb)) AS elem ON TRUE
+              LEFT JOIN LATERAL jsonb_array_elements(COALESCE(s.threats, '[]'::jsonb)) AS elem ON TRUE
               WHERE s.scanned_at >= (now() AT TIME ZONE 'utc') - (%s || ' days')::interval
             )
             SELECT
