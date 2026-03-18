@@ -3,6 +3,8 @@ from flask_cors import CORS
 from datetime import datetime, timezone
 import os
 import traceback
+import requests
+from urllib.parse import urlparse
 
 from scanning import scan_single_file
 from db import init_db_pool, save_scan_to_db, get_history
@@ -11,7 +13,7 @@ from commonvirus_db import (
     get_common_threats,
     get_threat_recent_scans,
 )
-from forum_routes import forum_bp
+from forum_routes import forum_bp 
 
 app = Flask(__name__, static_folder=".", static_url_path="")
 CORS(
@@ -179,6 +181,8 @@ def history():
     return jsonify({"results": results})
 
 
+#Common virus APIs
+
 @app.route("/api/common-viruses", methods=["GET"])
 def api_common_viruses():
     days = request.args.get("days", "30")
@@ -279,10 +283,86 @@ def api_virus_scans():
         user_id=user_id_int,
         limit=limit_i,
     )
+    
 
     return jsonify({"name": name, "days": days_i, "items": items})
 
+@app.route("/api/phishstats", methods=["GET"])
+def api_phishstats():
+    url = (request.args.get("url") or "").strip()
+    if not url:
+        return jsonify({
+            "service": "PhishStats",
+            "error": True,
+            "details": "missing url"
+        }), 400
 
+    try:
+        parsed = urlparse(url)
+        host = parsed.netloc.lower().strip()
+
+        if not host:
+            return jsonify({
+                "service": "PhishStats",
+                "error": True,
+                "details": "invalid url"
+            })
+
+        # Keep this lightweight: search by hostname only
+        resp = requests.get(
+            "https://api.phishstats.info/api/phishing",
+            params={
+                "_where": f"(url,like,{host})",
+                "_sort": "-date",
+                "_size": 5,
+            },
+            headers={
+                "Accept": "application/json",
+                "User-Agent": "ThreatCheck/1.0",
+            },
+            timeout=4,
+        )
+
+        if resp.status_code != 200:
+            return jsonify({
+                "service": "PhishStats",
+                "error": True,
+                "details": f"HTTP {resp.status_code}"
+            })
+
+        data = resp.json()
+        found = isinstance(data, list) and len(data) > 0
+
+        return jsonify({
+            "service": "PhishStats",
+            "safe": not found,
+            "disposition": "phishing" if found else "clean",
+            "brand": data[0].get("title", "N/A") if found else "N/A",
+            "resolved": found,
+            "records": data[:5] if found else []
+        })
+
+    except requests.exceptions.Timeout:
+        return jsonify({
+            "service": "PhishStats",
+            "error": True,
+            "details": "Service timed out"
+        })
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({
+            "service": "PhishStats",
+            "error": True,
+            "details": f"Request failed: {str(e)}"
+        })
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            "service": "PhishStats",
+            "error": True,
+            "details": str(e)
+        })
 
 if __name__ == "__main__":
     init_pools_once()

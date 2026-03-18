@@ -5,7 +5,7 @@
   const closeModalBtn = document.getElementById('closeModal');
   const backdrop = document.getElementById('modalBackdrop');
 
-  let cached = []; // list from API
+  let cached = [];
 
   function escapeHtml(s) {
     return String(s ?? '').replace(/[&<>"']/g, c => ({
@@ -91,49 +91,114 @@
     }).join('');
   }
 
+  function formatDetails(details) {
+    if (!details) return '';
+    if (typeof details === 'string') {
+      return `<pre class="details-pre">${escapeHtml(details)}</pre>`;
+    }
+    try {
+      return `<pre class="details-pre">${escapeHtml(JSON.stringify(details, null, 2))}</pre>`;
+    } catch {
+      return `<pre class="details-pre">${escapeHtml(String(details))}</pre>`;
+    }
+  }
+
+  function statusBadge(status) {
+    const value = (status || 'unknown').toLowerCase();
+
+    let cls = 'badge-neutral';
+    if (value.includes('clean')) cls = 'badge-ok';
+    else if (value.includes('threat') || value.includes('malicious') || value.includes('detected')) cls = 'badge-bad';
+    else if (value.includes('error')) cls = 'badge-warn';
+
+    return `<span class="status-badge ${cls}">${escapeHtml(status || 'unknown')}</span>`;
+  }
+
   function openModalFor(result) {
     const file = result.filename || '(unknown)';
     const when = formatDate(result.created_at);
-    const verdict = result.safe ? 'Clean' : 'Threats / Error';
+    const safe = !!result.safe;
+    const verdict = safe ? 'Clean' : 'Threats / Error';
 
     const threats = Array.isArray(result.threats) && result.threats.length
-      ? `<ul>${result.threats.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>`
-      : `<div class="muted">No threats listed.</div>`;
+      ? `
+        <div class="threat-list">
+          ${result.threats.map(t => `
+            <div class="threat-item">${escapeHtml(t)}</div>
+          `).join('')}
+        </div>
+      `
+      : `<div class="empty-state">No threats listed.</div>`;
 
     const engines = Array.isArray(result.scan_results) ? result.scan_results : [];
     const enginesHtml = engines.length
       ? engines.map(e => {
           const eng = e.engine || 'Engine';
           const status = e.status || 'unknown';
-          const details = e.details ? escapeHtml(
-            typeof e.details === 'string' ? e.details : JSON.stringify(e.details)
-          ) : '';
+          const detailsHtml = e.details ? formatDetails(e.details) : '';
           const error = e.error ? escapeHtml(e.error) : '';
 
           return `
-            <div class="engine">
-              <div class="row"><span class="k">Engine</span><span class="v">${escapeHtml(eng)}</span></div>
-              <div class="row"><span class="k">Status</span><span class="v">${escapeHtml(status)}</span></div>
-              ${details ? `<div class="row"><span class="k">Details</span><span class="v">${details}</span></div>` : ''}
-              ${error ? `<div class="row"><span class="k">Error</span><span class="v bad">${error}</span></div>` : ''}
+            <div class="engine-card">
+              <div class="engine-top">
+                <div class="engine-name">${escapeHtml(eng)}</div>
+                ${statusBadge(status)}
+              </div>
+
+              ${detailsHtml ? `
+                <div class="engine-section">
+                  <div class="engine-label">Details</div>
+                  ${detailsHtml}
+                </div>
+              ` : ''}
+
+              ${error ? `
+                <div class="engine-section">
+                  <div class="engine-label">Error</div>
+                  <div class="engine-error">${error}</div>
+                </div>
+              ` : ''}
             </div>
           `;
         }).join('')
-      : `<div class="muted">No engine data.</div>`;
+      : `<div class="empty-state">No engine data.</div>`;
 
     modalBody.innerHTML = `
-      <div class="details-grid">
-        <div><div class="k">Filename</div><div class="v">${escapeHtml(file)}</div></div>
-        <div><div class="k">Scanned</div><div class="v">${escapeHtml(when)}</div></div>
-        <div><div class="k">Verdict</div><div class="v ${statusClass(!!result.safe)}">${escapeHtml(verdict)}</div></div>
-        <div><div class="k">Message</div><div class="v">${escapeHtml(result.message || '')}</div></div>
+      <div class="scan-summary">
+        <div class="summary-card">
+          <div class="summary-label">Filename</div>
+          <div class="summary-value">${escapeHtml(file)}</div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-label">Scanned</div>
+          <div class="summary-value">${escapeHtml(when)}</div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-label">Verdict</div>
+          <div class="summary-value">
+            <span class="status-badge ${safe ? 'badge-ok' : 'badge-bad'}">${escapeHtml(verdict)}</span>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-label">Message</div>
+          <div class="summary-value">${escapeHtml(result.message || '—')}</div>
+        </div>
       </div>
 
-      <h3>Per-engine results</h3>
-      ${enginesHtml}
+      <div class="modal-section">
+        <h3>Per-engine results</h3>
+        <div class="engine-list">
+          ${enginesHtml}
+        </div>
+      </div>
 
-      <h3>Threats</h3>
-      ${threats}
+      <div class="modal-section">
+        <h3>Threats</h3>
+        ${threats}
+      </div>
     `;
 
     modal.setAttribute('aria-hidden', 'false');
@@ -171,7 +236,6 @@
     }
   }
 
-  // events
   body.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-idx]');
     if (!btn) return;

@@ -28,26 +28,60 @@ function scorePassword(s) {
 //Generate human-readable advice for improving the password.
 function pwAdvice(s) {
   const tips = [];
-    // Length and composition suggestions
-  if (s.length < 14) tips.push('Use 14+ characters (passphrase works great).');
+
+  if (s.length < 14) tips.push('Use at least 14 characters.');
   if (!/[A-Z]/.test(s)) tips.push('Add an uppercase letter.');
   if (!/[a-z]/.test(s)) tips.push('Add a lowercase letter.');
   if (!/\d/.test(s)) tips.push('Add a number.');
-  if (!/[^\w]/.test(s)) tips.push('Add a symbol.');
-  if (/([a-zA-Z0-9])\1{2,}/.test(s)) tips.push('Avoid repeating characters.');
-  if (/password|qwerty|12345|letmein|admin/i.test(s)) tips.push('Avoid common words.');
-  return tips.length ? 'Tips: ' + tips.join(' ') : 'Nice! Consider a manager to store it safely.';
+  if (!/[^\w]/.test(s)) tips.push('Add a symbol like ! or ?.');
+  if (/([a-zA-Z0-9])\1{2,}/.test(s)) tips.push('Avoid repeating the same character too much.');
+  if (/password|qwerty|12345|letmein|admin/i.test(s)) tips.push('Avoid common words or easy patterns.');
+
+  if (s.length > 0 && s.length < 14) {
+    tips.push('Try a passphrase instead of one word.');
+    tips.push('Think of a book quote, song lyric, or funny memory and change it slightly.');
+    tips.push('Try 3 or 4 random words, for example: Coffee!Rain7Tulip');
+  }
+
+  if (!/\s|-/.test(s) && s.length < 18) {
+    tips.push('Spaces or hyphens can make passphrases easier to remember.');
+  }
+
+  return tips;
 }
 
 // Wire up live scoring only if all required elements exist on the page
 if (pw && pwbar && pwtips) {
-   // Update visual meter width (0–100%)
   pw.addEventListener('input', () => {
     const s = pw.value.trim();
     const n = scorePassword(s);
     pwbar.style.width = n + '%';
-     // Show advice or default helper text
-    pwtips.textContent = s ? pwAdvice(s) : 'Start typing to get tips…';
+
+    if (!s) {
+      pwtips.innerHTML = `
+        <p class="tips-placeholder">
+          Start typing... try a quote, lyric, or 3 random words.
+        </p>
+      `;
+      return;
+    }
+
+    const tips = pwAdvice(s);
+
+    if (tips.length) {
+      pwtips.innerHTML = `
+        <p class="tips-title">Suggestions:</p>
+        <ul class="tips-list">
+          ${tips.map(tip => `<li>${tip}</li>`).join('')}
+        </ul>
+      `;
+    } else {
+      pwtips.innerHTML = `
+        <p class="tips-good">
+          Strong password. A password manager is the safest way to store it.
+        </p>
+      `;
+    }
   });
 }
 

@@ -309,14 +309,58 @@
               </ul>
             </div>
 
-            <div class="action-box danger">
-              <h4>⚠️ What to Do:</h4>
-              <ol>
-                <li><strong>Delete this file immediately</strong></li>
-                <li>If you opened it, run a full system scan</li>
-                <li>Change passwords if you entered any credentials</li>
-                <li>Monitor your accounts for unusual activity</li>
-              </ol>
+              <div class="action-box danger">
+              <h4>⚠️ What to Do Next</h4>
+
+              <div class="response-step">
+                <div class="response-step-number">1</div>
+                <div class="response-step-content">
+                  <div class="response-step-title">Delete or quarantine this file immediately</div>
+                  <div class="response-step-desc">
+                    This helps stop the file from being opened by accident or causing more harm on your device.
+                  </div>
+                </div>
+              </div>
+
+              <div class="response-step">
+                <div class="response-step-number">2</div>
+                <div class="response-step-content">
+                  <div class="response-step-title">Run a full system scan if the file was opened</div>
+                  <div class="response-step-desc">
+                    Some malicious files can drop extra files, change settings, or spread to other parts of your system after being opened.
+                  </div>
+                </div>
+              </div>
+
+              <div class="response-step">
+                <div class="response-step-number">3</div>
+                <div class="response-step-content">
+                  <div class="response-step-title">Change your passwords if you typed in any login details</div>
+                  <div class="response-step-desc">
+                    Malicious files can steal usernames, passwords, or session data. Changing your passwords helps protect your accounts.
+                  </div>
+                </div>
+              </div>
+
+              <div class="response-step">
+                <div class="response-step-number">4</div>
+                <div class="response-step-content">
+                  <div class="response-step-title">Monitor your accounts and device for unusual activity</div>
+                  <div class="response-step-desc">
+                    Watch for unknown logins, password reset emails, pop-ups, disabled antivirus, or strange file behaviour.
+                  </div>
+                </div>
+              </div>
+
+              <div class="response-step">
+                <div class="response-step-number">5</div>
+                <div class="response-step-content">
+                  <div class="response-step-title">Do not share or forward the file</div>
+                  <div class="response-step-desc">
+                    Sending the file to someone else could spread the threat further, even if it is only for testing.
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ` : `

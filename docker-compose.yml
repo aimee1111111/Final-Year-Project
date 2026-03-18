@@ -57,7 +57,6 @@ services:
     container_name: clamav
     ports:
       - "3310:3310"              # Host port 3310 -> container port 3310
-                                 # The web container can reach it internally via clamav:3310
 
     healthcheck:
       # Checks if clamd is listening on port 3310 inside the container

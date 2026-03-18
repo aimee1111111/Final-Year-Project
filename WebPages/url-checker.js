@@ -4,7 +4,7 @@ import {
   CHECKPHISH_API_KEY,
 } from "./config.js";
 
-// ─── Main logic ──────────────────────────────────────────────────────────────
+//Main logic
 document.addEventListener("DOMContentLoaded", () => {
   const urlButton    = document.getElementById("urlButton");
   const urlInputBox  = document.getElementById("urlInputBox");
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ─── API calls (unchanged) ───────────────────────────────────────────────────
+//API calls
 
 async function checkGoogleSafeBrowsing(url) {
   try {
@@ -256,26 +256,24 @@ async function checkDnsHealth(url) {
 
 async function checkPhishStats(url) {
   try {
-    const q   = encodeURIComponent(`(url,eq,${url})`);
-    const res = await fetch(`https://api.phishstats.info/api/phishing?_where=${q}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const arr   = await res.json();
-    const found = Array.isArray(arr) && arr.length > 0;
-    return {
-      service: "PhishStats",
-      safe: !found,
-      disposition: found ? "phishing" : "clean",
-      brand: found ? (arr[0].target || "N/A") : "N/A",
-      resolved: found,
-      records: found ? arr : []
-    };
+    const res = await fetch(
+      `http://localhost:5000/api/phishstats?url=${encodeURIComponent(url)}`
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.details || data.error || `HTTP ${res.status}`);
+    }
+
+    return data;
   } catch (e) {
     console.error("PhishStats error:", e);
     return { service: "PhishStats", error: true, details: e.message };
   }
 }
 
-// ─── Display ─────────────────────────────────────────────────────────────────
+//Display
 
 function displayCombinedResults(results, scanTime, scannedUrl) {
   const resultMessage = document.getElementById("resultMessage");
@@ -320,7 +318,7 @@ function displayCombinedResults(results, scanTime, scannedUrl) {
     ? scannedUrl.slice(0, 47) + "…"
     : (scannedUrl || "");
 
-  // ── Simple view ────────────────────────────────────────────────────────
+  //Simple view
   const simpleView = `
     <div class="uc-card uc-card--${variant}">
 
@@ -416,7 +414,7 @@ function displayCombinedResults(results, scanTime, scannedUrl) {
     </div>
   `;
 
-  // ── Technical view ─────────────────────────────────────────────────────
+  //Technical view 
   const threatValueClass = isDanger ? "uc-tech-stat__value--bad" : "uc-tech-stat__value--safe";
 
   let techHtml = `
@@ -450,7 +448,7 @@ function displayCombinedResults(results, scanTime, scannedUrl) {
   normalized.forEach(r => { techHtml += buildServiceRow(r); });
   techHtml += `</div>`;
 
-  // ── Wrapper with toggle ────────────────────────────────────────────────
+  // Wrapper with toggle
   const uid = "uc_" + Date.now();
 
   resultMessage.innerHTML = `
