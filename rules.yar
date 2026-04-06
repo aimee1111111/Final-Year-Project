@@ -1,22 +1,31 @@
+/*
+  ThreatCheck YARA rules
+
+  This file contains YARA rules used to detect suspicious or potentially
+  malicious files. Each rule looks for patterns linked to a certain type
+  of threat, such as executables, scripts, macros, webshells, ransomware
+  notes, PowerShell abuse, or suspicious network indicators.
+*/
+
 import "pe"
 
-//  Suspicious Executable Detection Rules 
-// used for Flagging files that are (or contain) Windows executables.
-
+// Suspicious Executable Detection Rules
+// Used to flag files that are, or contain, Windows executables.
 rule SuspiciousExecutable {
     meta:
         description = "Detects suspicious executable patterns"
         author = "Threat Check"
         severity = "medium"
     strings:
-        $mz = "MZ"  // DOS header signature — marks the start of a Windows executable
-        $pe = "PE"  // PE header signature — found in Windows Portable Executable files
+        $mz = "MZ"  // DOS header signature at the start of Windows executables
+        $pe = "PE"  // PE header signature found in Portable Executable files
     condition:
-        $mz at 0 and $pe  // File starts with 'MZ' and contains 'PE' — identifies a PE file
+        $mz at 0 and $pe
+        // Match if the file starts with MZ and also contains PE
 }
 
-// Script-based Threat Detection Rules 
-//used for JavaScript, Python, PHP, or mixed text with suspicious patterns.
+// Script-based Threat Detection Rules
+// Used for JavaScript, Python, PHP, or mixed text containing suspicious behaviour.
 rule SuspiciousScript
 {
     meta:
@@ -33,26 +42,28 @@ rule SuspiciousScript
         ($eval and $atob) or
         ($shell and $encode) or
         (3 of ($eval,$exec,$shell,$encode,$fromcc,$atob))
+        // Match when several suspicious scripting behaviours appear together
 }
 
-// Office Document with Macros 
-//used for Catching macro-bearing Office docs.
+// Office Document with Macros
+// Used for catching macro-enabled Office documents.
 rule MacroDocument {
     meta:
         description = "Detects Office documents with macros"
         author = "Threat Check"
         severity = "low"
     strings:
-        $macro1 = "VBAProject" nocase   // Marker for embedded VBA code
-        $macro2 = "MacroModule" nocase  // Common in macro-enabled docs
-        $macro3 = "AutoOpen" nocase     // Triggers code execution on open
-        $ole = { D0 CF 11 E0 A1 B1 1A E1 }  // OLE file header (used by .doc/.xls)
+        $macro1 = "VBAProject" nocase
+        $macro2 = "MacroModule" nocase
+        $macro3 = "AutoOpen" nocase
+        $ole = { D0 CF 11 E0 A1 B1 1A E1 }  // OLE file header for older Office documents
     condition:
-        $ole at 0 and any of ($macro*)  // OLE doc with at least one macro indicator
+        $ole at 0 and any of ($macro*)
+        // Match if the file is an OLE document and contains macro indicators
 }
 
-// PHP Webshell Detection 
-// used for Spotting malicious PHP backdoors.
+// PHP Webshell Detection
+// Used for spotting malicious PHP backdoors.
 rule PHPWebshell {
     meta:
         description = "Detects common PHP webshell patterns"
@@ -60,68 +71,70 @@ rule PHPWebshell {
         severity = "high"
     strings:
         $php = "<?php"                // PHP code start tag
-        $eval = "eval("               // Code execution
+        $eval = "eval("               // Dynamic code execution
         $system = "system("           // System command execution
-        $exec = "exec("               // Another system execution call
+        $exec = "exec("               // Alternate command execution call
         $shell = "shell_exec("        // Executes shell commands
-        $base64 = "base64_decode("    // Often used to decode obfuscated payloads
+        $base64 = "base64_decode("    // Common in obfuscated PHP malware
     condition:
         $php and 2 of ($eval, $system, $exec, $shell, $base64)
-        // Detects PHP scripts executing or decoding code (common in webshells)
+        // Match PHP files that also perform suspicious execution or decoding
 }
 
-// SQL Injection Pattern Detection 
-//used for Identifying potential SQL injection attempts.
+// SQL Injection Pattern Detection
+// Used for identifying common SQL injection payloads inside files or text.
 rule SQLInjectionPattern {
     meta:
         description = "Detects potential SQL injection patterns in files"
         author = "Threat Check"
         severity = "medium"
     strings:
-        $sql1 = /union\s+select/ nocase   // Typical SQLi join payload
+        $sql1 = /union\s+select/ nocase
         $sql2 = /'\s*or\s*'1'\s*=\s*'1/ nocase
         $sql3 = /'\s*or\s*1\s*=\s*1/ nocase
-        $sql4 = "xp_cmdshell" nocase      // Dangerous SQL Server command execution
+        $sql4 = "xp_cmdshell" nocase
     condition:
-        any of them  // Match any known SQLi signature
+        any of them
+        // Match if any known SQL injection pattern appears
 }
 
-//Suspicious Batch File 
-//used for Flagging potentially malicious batch scripts.
+// Suspicious Batch File
+// Used for flagging potentially malicious batch scripts.
 rule SuspiciousBatchScript {
     meta:
         description = "Detects potentially malicious batch scripts"
         author = "Threat Check"
         severity = "medium"
     strings:
-        $echo_off = "@echo off" nocase     // Common in batch scripts
-        $del = /del\s+\/f\s+\/q/ nocase    // Forced file deletion
-        $reg = "reg add" nocase            // Registry modification
-        $schtasks = "schtasks" nocase      // Task scheduling persistence
-        $download = /(powershell|curl|wget).*http/ nocase  // Downloading via batch
+        $echo_off = "@echo off" nocase
+        $del = /del\s+\/f\s+\/q/ nocase
+        $reg = "reg add" nocase
+        $schtasks = "schtasks" nocase
+        $download = /(powershell|curl|wget).*http/ nocase
     condition:
         $echo_off and 2 of ($del, $reg, $schtasks, $download)
-        // Flags scripts that combine stealth with system manipulation
+        // Match batch files that combine command execution with system changes or downloads
 }
 
-// Obfuscated JavaScript 
-//used for Detecting obfuscated JavaScript code.
+// Obfuscated JavaScript
+// Used for detecting JavaScript that appears intentionally hidden or encoded.
 rule ObfuscatedJavaScript {
     meta:
         description = "Detects obfuscated JavaScript code"
         author = "Threat Check"
         severity = "medium"
     strings:
-        $eval = "eval("                  // Dynamic code execution
-        $unescape = "unescape("          // String de-obfuscation
-        $fromcharcode = "fromCharCode("  // String reconstruction from char codes
-        $hex = /\\x[0-9a-f]{2}/ nocase   // Hexadecimal-encoded strings
+        $eval = "eval("
+        $unescape = "unescape("
+        $fromcharcode = "fromCharCode("
+        $hex = /\\x[0-9a-f]{2}/ nocase
     condition:
-        2 of them  // Detects scripts using multiple obfuscation techniques
+        2 of them
+        // Match when at least two obfuscation patterns are found
 }
 
 // Ransomware Note Indicators
-// used for Identifying potential ransomware note patterns.
+// Used for identifying possible ransom note text.
 rule PotentialRansomwareNote {
     meta:
         description = "Detects potential ransomware note patterns"
@@ -133,13 +146,13 @@ rule PotentialRansomwareNote {
         $ransom3 = "decrypt" nocase
         $ransom4 = "payment" nocase
         $ransom5 = /pay.*bitcoins?/ nocase
-        
     condition:
-        3 of them  // Detects ransom notes mentioning encryption and payment
+        3 of them
+        // Match if the text strongly resembles a ransom demand
 }
 
-//Suspicious PowerShell Commands
-//used for Detecting suspicious PowerShell command patterns.
+// Suspicious PowerShell Commands
+// Used for detecting PowerShell often linked to malware delivery or stealth.
 rule SuspiciousPowerShell {
     meta:
         description = "Detects suspicious PowerShell command patterns"
@@ -154,11 +167,11 @@ rule SuspiciousPowerShell {
         $webclient = "Net.WebClient" nocase
     condition:
         $ps1 and 2 of ($bypass, $hidden, $encoded, $download, $webclient)
-        // Detects PowerShell used stealthily or for downloading payloads
+        // Match PowerShell commands that use stealth or download behaviour
 }
 
-//Suspicious API Imports in Executables
-// used for Flagging PEs importing runtime APIs often used in attacks.
+// Suspicious API Imports in Executables
+// Used for flagging PE files importing APIs often seen in malware techniques.
 rule SuspiciousPEImports {
     meta:
         description = "PEs importing suspicious runtime APIs"
@@ -173,11 +186,11 @@ rule SuspiciousPEImports {
             pe.imports("kernel32.dll", "LoadLibraryA") or
             pe.imports("kernel32.dll", "GetProcAddress")
         )
-        // Flags executables importing APIs commonly used in process injection or code loading
+        // Match PEs using APIs often associated with injection or dynamic loading
 }
 
-//Network Indicator Detection
-//used for Detecting suspicious URLs, IP:port combinations, or unusual domains.
+// Network Indicator Detection
+// Used for detecting suspicious URLs, IP:port values, or unusual domains.
 rule SuspiciousNetworkIndicators {
     meta:
         description = "Detect suspicious URLs, IP:port or obvious C2 domains"
@@ -189,11 +202,11 @@ rule SuspiciousNetworkIndicators {
         $sld = /[a-z0-9\-]{10,}\.(com|xyz|top|site|online)/ nocase
     condition:
         any of them
-        // Detects suspicious URLs, hardcoded IP:ports, or unusual C2 domains
+        // Match if the file contains suspicious network-related indicators
 }
 
 // Suspicious VBA in Office Docs
-//used for Detecting Office documents embedding suspicious VBA code.
+// Used for detecting Office documents that embed dangerous VBA behaviour.
 rule EmbeddedSuspiciousVBA {
     meta:
         description = "Office doc embedding suspicious VBA calls"
@@ -201,14 +214,16 @@ rule EmbeddedSuspiciousVBA {
         severity = "high"
     strings:
         $vba = "VBAProject" nocase
-        $createobject = "CreateObject(" nocase     // Used to instantiate COM objects
-        $shell = "WScript.Shell" nocase            // Used to execute commands
-        $download = "URLDownloadToFile" nocase     // Downloading external payloads
+        $createobject = "CreateObject(" nocase
+        $shell = "WScript.Shell" nocase
+        $download = "URLDownloadToFile" nocase
     condition:
         $vba and 2 of ($createobject, $shell, $download)
-        // Detects malicious macros creating shell objects or downloading files
+        // Match documents containing VBA plus suspicious object creation or downloading
 }
 
+// Dangerous Python Dynamic Execution
+// Used for detecting Python code that dynamically runs data with eval or exec.
 rule DangerousPythonDynamicExecution
 {
     meta:
@@ -221,12 +236,14 @@ rule DangerousPythonDynamicExecution
         $py_exec  = "exec("  nocase ascii wide
         $py_data  = "data"   nocase ascii wide
     condition:
-        // Strong match for patterns like:
-        // data = "..."; eval(data); exec("...")
-        ( $py_eval and $py_exec ) or
-        ( $py_data and $py_eval ) or
-        ( $py_exec and $py_print )
+        ($py_eval and $py_exec) or
+        ($py_data and $py_eval) or
+        ($py_exec and $py_print)
+        // Match Python files that appear to evaluate or execute dynamic content
 }
+
+// Python eval/exec demo pattern
+// Used for catching demo or test scripts that use eval(data) and exec().
 rule PythonEvalExecDemoPattern
 {
     meta:
@@ -239,4 +256,5 @@ rule PythonEvalExecDemoPattern
         $execp  = /exec\(\s*["']print\(/ nocase ascii
     condition:
         $assign and $evald and $execp
+        // Match very specific demo-style Python dynamic execution patterns
 }

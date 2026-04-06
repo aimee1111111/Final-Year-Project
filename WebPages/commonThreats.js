@@ -1,3 +1,13 @@
+/*
+  Common threats page script
+
+  This file loads and displays the most frequently detected threats from
+  the backend. It lets the user filter results by time range, minimum hit
+  count, and threat name. When a threat is selected, the script also loads
+  extra details such as a summary, prevention advice, removal advice, and
+  recent scan history.
+*/
+
 const API_BASE = "http://localhost:5001";
 
 const els = {
@@ -18,8 +28,10 @@ const els = {
   scanTbody: document.getElementById("scanTbody"),
 };
 
+// Stores the most recently loaded threat list
 let lastItems = [];
 
+// Builds the query string parameters from the filter controls
 function qsParams() {
   const days = Number(els.days.value || 30);
   const minCount = Number(els.minCount.value || 10);
@@ -33,14 +45,17 @@ function qsParams() {
   return p;
 }
 
+// Updates the small status message on the page
 function setStatus(msg) {
   els.status.textContent = msg;
 }
 
+// Removes all child elements from a container
 function clearChildren(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
 }
 
+// Formats backend date strings into a readable local date/time
 function fmtDate(s) {
   if (!s) return "";
   const d = new Date(s);
@@ -48,6 +63,7 @@ function fmtDate(s) {
   return d.toLocaleString();
 }
 
+// Creates one clickable threat item for the list on the left
 function makeListItem(item) {
   const li = document.createElement("li");
   li.className = "listItem";
@@ -73,10 +89,12 @@ function makeListItem(item) {
   li.appendChild(row);
   li.appendChild(meta);
 
+  // When clicked, load the detailed view for this threat
   li.addEventListener("click", () => selectThreat(item, li));
   return li;
 }
 
+// Loads the common threat list from the backend using the current filters
 async function loadCommonThreats() {
   els.details.classList.add("hidden");
   els.detailsEmpty.classList.remove("hidden");
@@ -85,7 +103,7 @@ async function loadCommonThreats() {
   clearChildren(els.threatList);
 
   const p = qsParams();
-const res = await fetch(`${API_BASE}/api/common-viruses?${p.toString()}`);
+  const res = await fetch(`${API_BASE}/api/common-viruses?${p.toString()}`);
 
   if (!res.ok) {
     setStatus(`Error loading list: ${res.status}`);
@@ -101,22 +119,27 @@ const res = await fetch(`${API_BASE}/api/common-viruses?${p.toString()}`);
   }
 
   setStatus(`Found ${lastItems.length} threats.`);
+
   for (const item of lastItems) {
     els.threatList.appendChild(makeListItem(item));
   }
 }
 
+// Loads and displays the details for one selected threat
 async function selectThreat(item, liEl) {
+  // Highlight the selected threat in the list
   for (const child of els.threatList.children) child.classList.remove("active");
   liEl.classList.add("active");
 
   els.detailsEmpty.classList.add("hidden");
   els.details.classList.remove("hidden");
 
+  // Fill the top section with the selected threat's main info
   els.threatName.textContent = item.threat_name;
   els.threatHits.textContent = `${item.hits} hits`;
   els.threatMeta.textContent = `Last seen: ${fmtDate(item.last_seen)}`;
 
+  // Load general information about the selected threat
   const infoRes = await fetch(
     `${API_BASE}/api/virus?name=${encodeURIComponent(item.threat_name)}`
   );
@@ -124,6 +147,7 @@ async function selectThreat(item, liEl) {
 
   els.summary.textContent = info?.summary || "No information available.";
 
+  // Fill the "how to avoid" list
   clearChildren(els.avoidList);
   (info?.how_to_avoid || []).forEach((t) => {
     const li = document.createElement("li");
@@ -131,6 +155,7 @@ async function selectThreat(item, liEl) {
     els.avoidList.appendChild(li);
   });
 
+  // Fill the "how to get rid of it" list
   clearChildren(els.ridList);
   (info?.how_to_get_rid || []).forEach((t) => {
     const li = document.createElement("li");
@@ -138,8 +163,10 @@ async function selectThreat(item, liEl) {
     els.ridList.appendChild(li);
   });
 
+  // Clear any old scan history rows
   clearChildren(els.scanTbody);
 
+  // Load scan history for this specific threat
   const p = qsParams();
   p.set("name", item.threat_name);
   p.set("limit", "100");
@@ -169,6 +196,7 @@ async function selectThreat(item, liEl) {
     return;
   }
 
+  // Add one row per scan record
   for (const s of scans) {
     const tr = document.createElement("tr");
 
@@ -181,20 +209,18 @@ async function selectThreat(item, liEl) {
     const tdSafe = document.createElement("td");
     tdSafe.textContent = String(s.safe);
 
-    const tdMime = document.createElement("td");
-    tdMime.textContent = s.mime_type ?? "";
-
     tr.appendChild(tdAt);
     tr.appendChild(tdSha);
     tr.appendChild(tdSafe);
-    tr.appendChild(tdMime);
 
     els.scanTbody.appendChild(tr);
   }
 }
 
+// Reload the list when the user clicks refresh
 els.refreshBtn.addEventListener("click", () => {
   loadCommonThreats().catch((err) => setStatus(`Error: ${err.message}`));
 });
 
+// Initial page load
 loadCommonThreats().catch((err) => setStatus(`Error: ${err.message}`));

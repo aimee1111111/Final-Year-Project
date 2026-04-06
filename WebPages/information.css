@@ -1,9 +1,11 @@
+/* reset default spacing and make box sizing easier to manage */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* reusable colour, shadow, and spacing variables */
 :root {
   --bg-primary: #0a0e27;
   --bg-secondary: #151934;
@@ -20,15 +22,21 @@
   --surface-2: rgba(21, 25, 52, 0.9);
   --input-bg: rgba(10, 14, 39, 0.7);
   --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.45);
+
+  /* focus ring for accessible keyboard focus */
   --ring: 0 0 0 3px rgba(0, 245, 255, 0.35), 0 0 20px rgba(0, 245, 255, 0.2);
+
+  /* shared border radius */
   --radius: 14px;
 }
 
+/* make page at least full screen height */
 html,
 body {
   min-height: 100vh;
 }
 
+/* main page styling */
 body {
   font-family: "JetBrains Mono", monospace;
   background: var(--bg-primary);
@@ -43,6 +51,8 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
+
+  /* animated grid background */
   background-image:
     linear-gradient(var(--grid-color) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
@@ -55,6 +65,8 @@ body::after {
   content: "";
   position: fixed;
   inset: 0;
+
+  /* blurred glowing colour blobs */
   background:
     radial-gradient(circle at 85% 5%, rgba(0, 245, 255, 0.22) 0 220px, transparent 320px),
     radial-gradient(circle at 8% 92%, rgba(255, 0, 110, 0.22) 0 260px, transparent 360px);
@@ -63,6 +75,7 @@ body::after {
   pointer-events: none;
 }
 
+/* animation that slowly moves the grid */
 @keyframes gridMove {
   from { transform: translate(0, 0); }
   to { transform: translate(50px, 50px); }
@@ -74,9 +87,11 @@ body::after {
   top: 0;
   left: 0;
   width: 100%;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   padding: 14px 28px;
   background: rgba(21, 25, 52, 0.7);
   backdrop-filter: blur(10px);
@@ -85,6 +100,7 @@ body::after {
   box-shadow: var(--shadow-soft);
 }
 
+/* site logo text */
 .logo {
   font-family: "Syne", sans-serif;
   font-size: 1.4rem;
@@ -95,6 +111,7 @@ body::after {
   background-clip: text;
 }
 
+/* right side nav links */
 .nav-right a {
   margin-left: 20px;
   text-decoration: none;
@@ -103,10 +120,12 @@ body::after {
   transition: color 0.25s ease;
 }
 
+/* nav hover effect */
 .nav-right a:hover {
   color: var(--text-primary);
 }
 
+/* logout button styling */
 .logout-btn {
   background: transparent;
   border: 1px solid var(--accent-magenta);
@@ -116,6 +135,7 @@ body::after {
   transition: all 0.25s ease;
 }
 
+/* logout button hover */
 .logout-btn:hover {
   background: var(--accent-magenta);
   color: #fff !important;
@@ -127,10 +147,11 @@ main.cyber {
   padding: 110px 20px 56px;
 }
 
+/* main width wrapper */
 .container,
 .wrap {
-  max-width: 1100px;
-  width: min(1100px, calc(100% - 48px));
+  max-width: 1400px;
+  width: min(1400px, calc(100% - 40px));
   margin: 0 auto;
 }
 
@@ -141,9 +162,10 @@ main.cyber {
   margin-bottom: 28px;
 }
 
+/* main hero heading */
 .hero-title {
   font-family: "Syne", sans-serif;
-  font-size: clamp(28px, 4vw, 44px);
+  font-size: clamp(58px, 10vw, 74px);
   line-height: 1.1;
   margin: 10px 0 6px;
   background: linear-gradient(135deg, #fff, var(--text-secondary));
@@ -152,6 +174,7 @@ main.cyber {
   background-clip: text;
 }
 
+/* buttons under hero section */
 .hero-cta {
   display: flex;
   flex-wrap: wrap;
@@ -170,6 +193,7 @@ main.cyber {
   transition: transform 0.2s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* hover effect for panels and cards */
 .panel:hover,
 .card:hover {
   transform: translateY(-3px);
@@ -177,11 +201,13 @@ main.cyber {
   box-shadow: 0 0 30px rgba(0, 245, 255, 0.14), var(--shadow-soft);
 }
 
+/* padding for larger content blocks */
 .hero-card,
 .panel {
   padding: 22px;
 }
 
+/* card grid layout */
 .grid.cards {
   display: grid;
   gap: 14px;
@@ -190,23 +216,33 @@ main.cyber {
 /* Typography */
 .section-title {
   font-family: "Syne", sans-serif;
-  font-size: clamp(20px, 2.8vw, 32px);
+  font-size: clamp(40px, 2.8vw, 32px);
   margin: 10px 0 14px;
 }
 
+/* smaller subtitle text */
 .sub {
   color: var(--text-secondary);
-  font-size: 15px;
+  font-size: 22px;
 }
 
+/* paragraph text inside cards and panels */
+.panel p,
+.card p {
+  font-size: 1.25rem;
+  line-height: 1.8;
+}
+
+/* small uppercase label text */
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 22px;
   color: var(--text-secondary);
 }
 
+/* tighter unordered list styling */
 ul.tight {
   list-style: disc;
   padding-left: 18px;
@@ -214,7 +250,15 @@ ul.tight {
 }
 
 ul.tight li {
-  margin: 6px 0;
+  margin: 8px 0;
+  font-size: 1.18rem;
+  line-height: 1.7;
+}
+
+/* bigger paragraph text inside accordion initially */
+details.accordion p {
+  font-size: 1.55rem;
+  line-height: 1.6;
 }
 
 /* Buttons */
@@ -233,16 +277,19 @@ ul.tight li {
   transition: 0.25s ease;
 }
 
+/* focus styling for accessibility */
 .btn:focus-visible {
   outline: none;
   box-shadow: var(--ring);
 }
 
+/* disabled button appearance */
 .btn[disabled] {
   opacity: 0.65;
   cursor: not-allowed;
 }
 
+/* primary buttons and hero call-to-action buttons */
 .btn-primary,
 .hero-cta .btn,
 .hero-cta a.btn {
@@ -252,16 +299,19 @@ ul.tight li {
   box-shadow: 0 8px 24px rgba(0, 245, 255, 0.25);
 }
 
+/* ghost/secondary button style */
 .btn-ghost {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
   border-color: var(--border-soft);
 }
 
+/* slight lift on hover */
 .btn:hover {
   transform: translateY(-1px);
 }
 
+/* ghost button hover */
 .btn-ghost:hover {
   border-color: var(--border-cyan);
   background: rgba(255, 255, 255, 0.1);
@@ -276,36 +326,48 @@ details.accordion {
   border: 1px solid var(--border-soft);
 }
 
+/* clickable accordion heading */
 details.accordion summary {
   list-style: none;
   cursor: pointer;
   padding: 14px 16px;
 }
 
+/* removes default browser marker */
 details.accordion summary::-webkit-details-marker {
   display: none;
 }
 
+/* layout for accordion title row */
 details.accordion .title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  font-size: 16px;
+  font-size: 1.35rem;
+  font-weight: 700;
 }
 
+/* darker background when accordion is open */
 details.accordion[open] {
   background: var(--surface-2);
 }
 
+/* divider line when open */
 details.accordion[open] summary {
   border-bottom: 1px solid var(--border-soft);
 }
 
+/* paragraph styling inside accordion */
 details.accordion p {
-  padding: 12px 16px 16px;
-  color: var(--text-secondary);
-  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.8;
+}
+
+/* Cyber tips box */
+.hero-card ul.tight li {
+  font-size: 1.15rem;
+  line-height: 1.7;
 }
 
 /* Inputs */
@@ -321,10 +383,12 @@ details.accordion p {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* placeholder text colour */
 .input::placeholder {
   color: rgba(255, 255, 255, 0.55);
 }
 
+/* input focus state */
 .input:focus {
   border-color: var(--accent-cyan);
   box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.2);
@@ -340,6 +404,7 @@ details.accordion p {
   overflow: hidden;
 }
 
+/* inner fill bar of meter */
 .meter > span {
   display: block;
   height: 100%;
@@ -358,32 +423,50 @@ details.accordion p {
   margin-bottom: 12px;
 }
 
-.quiz h4 {
-  margin: 0 0 10px;
-  font-size: 16px;
+/* smaller supporting quiz text */
+.quiz .sub {
+  font-size: 22px;
+  line-height: 1.5;
+  margin-bottom: 18px;
 }
 
+.quiz h4 {
+  margin: 0 0 10px;
+  font-size: 30px;
+}
+
+/* larger quiz action buttons */
+.quiz-actions .btn {
+  padding: 18px 28px;
+  font-size: 1.15rem;
+}
+
+/* answer choice list */
 .choices {
   display: grid;
   gap: 8px;
 }
 
+/* each quiz answer option */
 .choice {
   display: grid;
-  grid-template-columns: 18px 1fr;
+  grid-template-columns: 25px 1fr;
   align-items: start;
   gap: 8px;
+  font-size: 20px;
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid transparent;
   transition: 0.15s ease;
 }
 
+/* answer hover */
 .choice:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--border-soft);
 }
 
+/* radio button styling */
 .choice input[type="radio"] {
   accent-color: var(--accent-yellow);
   width: 16px;
@@ -391,16 +474,19 @@ details.accordion p {
   margin-top: 2px;
 }
 
+/* correct answer style */
 .choice.correct {
   background: rgba(51, 209, 122, 0.15);
   border-color: rgba(51, 209, 122, 0.55);
 }
 
+/* wrong answer style */
 .choice.wrong {
   background: rgba(255, 77, 77, 0.15);
   border-color: rgba(255, 77, 77, 0.55);
 }
 
+/* explanation text hidden by default */
 .explain {
   display: none;
   margin-top: 8px;
@@ -408,6 +494,7 @@ details.accordion p {
   font-size: 14px;
 }
 
+/* bottom quiz actions layout */
 .quiz-actions {
   display: flex;
   flex-wrap: wrap;
@@ -417,6 +504,7 @@ details.accordion p {
   margin-top: 12px;
 }
 
+/* score area */
 .score {
   display: flex;
   align-items: center;
@@ -424,6 +512,7 @@ details.accordion p {
   margin-left: auto;
 }
 
+/* score bar background */
 .scorebar {
   width: 160px;
   height: 10px;
@@ -432,6 +521,7 @@ details.accordion p {
   overflow: hidden;
 }
 
+/* inner score fill */
 .scorebar > #scorebar {
   display: block;
   width: 0%;
@@ -440,6 +530,7 @@ details.accordion p {
   transition: width 0.25s ease;
 }
 
+/* score text beside score bar */
 .score-text {
   min-width: 150px;
   text-align: right;
@@ -454,6 +545,7 @@ a:hover {
   text-decoration: underline;
 }
 
+/* prevents buttons that are links from getting underline */
 a.btn,
 a.btn:hover,
 .hero-cta a,
@@ -476,6 +568,7 @@ a.btn:hover,
   word-break: break-word;
 }
 
+/* title and helper text inside password tips box */
 .tips-title,
 .tips-good,
 .tips-placeholder {
@@ -489,6 +582,7 @@ a.btn:hover,
   font-weight: 700;
 }
 
+/* password tips bullet list */
 .tips-list {
   margin: 0;
   padding-left: 22px;
@@ -502,20 +596,24 @@ a.btn:hover,
   margin-bottom: 0;
 }
 
+/* good password message */
 .tips-good {
   color: #7dffb3;
 }
 
+/* placeholder tips text */
 .tips-placeholder {
   color: var(--text-secondary);
 }
 
 /* Responsive */
 @media (min-width: 680px) {
+  /* split hero into two columns on wider screens */
   .hero {
     grid-template-columns: 2fr 1.2fr;
   }
 
+  /* make cards into 3 columns */
   .grid.cards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -535,11 +633,13 @@ a.btn:hover,
     font-size: 2.15rem;
   }
 
+  /* hero buttons stack full width on smaller screens */
   .hero-cta .btn {
     width: 100%;
   }
 }
 
+/* reduces motion for users who prefer less animation */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;

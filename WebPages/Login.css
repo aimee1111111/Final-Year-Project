@@ -1,5 +1,11 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* reset default browser spacing and use border-box sizing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+/* global variables for colours, shadows, and reusable styles */
 :root {
   --bg: #0a0e27;
   --panel: rgba(21, 25, 52, 0.75);
@@ -14,20 +20,30 @@
   --glow: 0 0 25px rgba(0, 245, 255, 0.15);
 }
 
-/*body */
-html, body { min-height: 100vh; }
+/* make page take full available size */
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+}
 
+/* page background and centre the login box */
 body {
   font-family: "JetBrains Mono", monospace;
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
-  display: grid;
-  place-items: center;
-  padding: 24px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 100vh;
+  padding: clamp(20px, 4vw, 32px);
+  position: relative;
 }
 
-/* Background */
+/* decorative background layers */
 body::before,
 body::after {
   content: "";
@@ -35,109 +51,146 @@ body::after {
   inset: 0;
   pointer-events: none;
 }
+
+/* animated-style cyber grid background */
 body::before {
   z-index: -2;
-  background-image:
-    linear-gradient(rgba(0,245,255,.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,245,255,.1) 1px, transparent 1px);
+  background:
+    linear-gradient(rgba(0, 245, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 245, 255, 0.1) 1px, transparent 1px);
   background-size: 50px 50px;
 }
+
+/* blurred glowing colour spots */
 body::after {
   z-index: -1;
   background:
-    radial-gradient(circle at 85% 5%, rgba(0,245,255,.22) 0 220px, transparent 320px),
-    radial-gradient(circle at 8% 92%, rgba(255,0,110,.22) 0 260px, transparent 360px);
+    radial-gradient(circle at 85% 5%, rgba(0, 245, 255, 0.22) 0 220px, transparent 320px),
+    radial-gradient(circle at 8% 92%, rgba(255, 0, 110, 0.22) 0 260px, transparent 360px);
   filter: blur(20px);
 }
 
-/* login card*/
+/* main login panel */
 .login-container {
-  width: min(100%, 390px);
-  padding: 34px 28px;
+  width: min(92vw, 560px);
+  padding: clamp(28px, 5vw, 46px);
   text-align: center;
-  border-radius: 16px;
+  border-radius: 20px;
   background: var(--panel);
   border: 1px solid var(--border-cyan);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   box-shadow: var(--glow), var(--shadow);
 }
 
+/* login heading */
 .login-container h2 {
   margin-bottom: 22px;
-  font: 700 clamp(1.8rem, 4vw, 2.2rem)/1.1 "Syne", sans-serif;
+  font: 700 clamp(3.1rem, 5vw, 2.8rem)/1.1 "Syne", sans-serif;
   letter-spacing: -0.02em;
+
+  /* gradient text effect */
   background: linear-gradient(135deg, #fff, var(--muted));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
+/* paragraph text under form */
 .login-container p {
-  margin-top: 12px;
-  font-size: 0.9rem;
+  margin-top: 16px;
+  font-size: clamp(1.5rem, 2.2vw, 1rem);
   color: var(--muted);
 }
 
-/* Inputs + Button */
+/* shared styling for inputs and button */
 .login-container input,
 .login-container button {
   width: 100%;
-  border-radius: 10px;
-  font: 600 0.95rem "JetBrains Mono", monospace;
+  border-radius: 12px;
+  font: 600 clamp(1.3rem, 2.2vw, 1.05rem) "JetBrains Mono", monospace;
 }
 
+/* input field styling */
 .login-container input {
-  margin: 9px 0;
-  padding: 12px;
+  margin: 10px 0;
+  padding: 16px;
   border: 1px solid var(--border);
   background: var(--input);
   color: var(--text);
   outline: none;
 }
-.login-container input::placeholder { color: rgba(168,178,209,.85); }
-.login-container input:focus {
-  border-color: var(--cyan);
-  box-shadow: 0 0 0 3px rgba(0,245,255,.2);
+
+/* placeholder text colour */
+.login-container input::placeholder {
+  color: rgba(168, 178, 209, 0.85);
 }
 
+/* input focus effect */
+.login-container input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.2);
+}
+
+/* login button styling */
 .login-container button {
-  margin-top: 12px;
-  padding: 12px 0;
+  margin-top: 16px;
+  padding: 16px;
   border: 0;
   cursor: pointer;
   color: #fff;
   background: linear-gradient(135deg, var(--cyan), var(--magenta));
-  box-shadow: 0 8px 24px rgba(0,245,255,.22);
+  box-shadow: 0 8px 24px rgba(0, 245, 255, 0.22);
+  font-weight: 700;
 }
-.login-container button:hover { filter: brightness(1.05); }
-.login-container button:active { transform: translateY(1px); }
 
-/* Error + Links */
+/* button hover effect */
+.login-container button:hover {
+  filter: brightness(1.05);
+}
+
+/* button pressed effect */
+.login-container button:active {
+  transform: translateY(1px);
+}
+
+/* error message box */
 .error {
   display: none;
   margin-bottom: 12px;
   padding: 11px 12px;
   text-align: left;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   border-radius: 10px;
   color: #ffe6eb;
   background: rgba(255, 0, 110, 0.18);
   border: 1px solid rgba(255, 0, 110, 0.5);
 }
 
+/* links inside login container */
 .login-container a {
   color: var(--cyan);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-.login-container a:hover { color: var(--text); }
 
-/* ===== Responsive + Accessibility ===== */
-@media (max-width: 480px) {
-  body { padding: 16px; }
-  .login-container { padding: 26px 20px; border-radius: 14px; }
+/* link hover effect */
+.login-container a:hover {
+  color: var(--text);
 }
 
+/* small mobile adjustments */
+@media (max-width: 480px) {
+  .login-container {
+    width: 100%;
+    padding: 24px 18px;
+    border-radius: 16px;
+  }
+}
+
+/* accessibility: remove animations/transitions if user prefers reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

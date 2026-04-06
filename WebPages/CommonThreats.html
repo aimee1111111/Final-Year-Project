@@ -1,104 +1,153 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Basic page setup -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Page title shown in browser tab -->
   <title>Common Viruses</title>
+
+  <!-- External stylesheet for this page -->
   <link rel="stylesheet" href="/CommonThreats.css" />
 </head>
 <body>
 
+  <!-- Main navigation bar -->
   <nav class="navbar">
     <div class="nav-left">
+      <!-- Website logo/name -->
       <h2 class="logo">ThreatCheck</h2>
     </div>
-   <div class="nav-right">
+
+    <div class="nav-right">
+      <!-- Navigation links to other pages -->
       <a href="Home.html">Home</a>
       <a href="Information.html">Information</a>
       <a href="ScanHistory.html">Scan History</a>
-       <a href="posts.html">posts</a>
-       <a href="CommonThreats.html">Common Threats</a>
+      <a href="posts.html">posts</a>
+      <a href="CommonThreats.html">Common Threats</a>
       <a href="logout.html" class="logout-btn">Log Out</a>
     </div>
   </nav>
 
+  <!-- Top section containing page title and filters -->
   <header class="topbar">
     <div class="wrap">
+      <!-- Main heading -->
       <h1>Common Viruses</h1>
-      <p class="subtitle">Threats detected at least 10 times in the past 30  days</p>
 
+      <!-- Short description of what this page shows -->
+      <p class="subtitle">Threats detected at least 10 times in the past 30 days</p>
+
+      <!-- Filter controls -->
       <div class="controls">
         <label>
           Days
+          <!-- Number of days to search within -->
           <input id="days" type="number" min="1" max="365" value="30" />
         </label>
+
         <label>
           Min hits
+          <!-- Minimum number of times a threat must appear -->
           <input id="minCount" type="number" min="1" value="10" />
         </label>
+
         <label>
           Virus Name
-          <!-- FIX: id must match JS (virusName) -->
+          <!-- Optional search by virus/threat name -->
           <input id="virusName" type="text" placeholder="Eicar-Signature" />
         </label>
+
+        <!-- Button to refresh results -->
         <button id="refreshBtn">Refresh</button>
       </div>
     </div>
   </header>
 
+  <!-- Main page content -->
   <main class="wrap grid">
+
+    <!-- Left panel showing list of common threats -->
     <section class="panel">
       <h2>Most common threats</h2>
+
+      <!-- Status text such as loading or error messages -->
       <div id="status" class="status">Loading…</div>
+
+      <!-- Threat list will be inserted here using JavaScript -->
       <ul id="threatList" class="list"></ul>
     </section>
 
+    <!-- Right panel showing selected threat details -->
     <section class="panel">
       <h2>Threat details</h2>
+
+      <!-- Message shown before a threat is selected -->
       <div id="detailsEmpty" class="empty">
         Select a threat from the left to see information and recent scans.
       </div>
 
+      <!-- Full threat details section, hidden until a threat is selected -->
       <div id="details" class="details hidden">
+
+        <!-- Header section for selected threat -->
         <div class="detailsHead">
           <div>
+            <!-- Threat name -->
             <div id="threatName" class="threatName"></div>
+
+            <!-- Extra metadata about the threat -->
             <div id="threatMeta" class="threatMeta"></div>
           </div>
+
+          <!-- Shows number of hits/detections -->
           <div class="pill" id="threatHits"></div>
         </div>
 
+        <!-- Summary card -->
         <div class="card">
           <h3>Summary</h3>
           <p id="summary"></p>
         </div>
 
+        <!-- Two-column advice section -->
         <div class="twoCol">
+
+          <!-- Prevention advice -->
           <div class="card">
             <h3>How to avoid</h3>
             <ul id="avoidList"></ul>
           </div>
+
+          <!-- Removal advice -->
           <div class="card">
             <h3>How to get rid of it</h3>
             <ul id="ridList"></ul>
           </div>
         </div>
 
+        <!-- Recent scan history for the selected threat -->
         <div class="card">
           <h3>Recent scans for this threat</h3>
+
+          <!-- Small helper text -->
           <div class="hint">Showing up to 100 scans in the selected time window.</div>
+
+          <!-- Scrollable table container -->
           <div class="tableWrap">
             <table>
-             <thead>
-              <tr>
-                <th>Scanned at</th>
-                <th>SHA256</th>
-                <th>Safe</th>
-                <th>MIME type</th>
-              </tr>
-            </thead>
-            <tbody id="scanTbody"></tbody>
+              <thead>
+                <tr>
+                  <th>Scanned at</th>
+                  <th>SHA256</th>
+                  <th>Safe</th>
+                </tr>
+              </thead>
 
+              <!-- Scan rows will be inserted here using JavaScript -->
+              <tbody id="scanTbody"></tbody> 
             </table>
           </div>
         </div>
@@ -106,6 +155,7 @@
     </section>
   </main>
 
+  <!-- JavaScript file for loading and displaying threat data -->
   <script src="/commonThreats.js"></script>
 </body>
 </html>

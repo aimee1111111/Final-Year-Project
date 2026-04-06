@@ -1,62 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- character encoding -->
   <meta charset="UTF-8" />
+
+  <!-- makes page responsive on phones/tablets -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- page title shown in browser tab -->
   <title>File Upload & Scan</title>
+
+  <!-- links external CSS file -->
   <link rel="stylesheet" href="files.css">
-  <script src="files.js" defer></script>
+
+  <!-- links JavaScript file for upload/scan functionality -->
+  <script type="module" src="file-upload.js"></script>
 </head>
 <body>
+
+  <!-- top navigation bar -->
   <nav class="navbar">
     <div class="nav-left">
+      <!-- website/project logo -->
       <h2 class="logo">ThreatCheck</h2>
     </div>
+
     <div class="nav-right">
+      <!-- navigation links to other pages -->
       <a href="Home.html">Home</a>
       <a href="Information.html">Information</a>
       <a href="ScanHistory.html">Scan History</a>
-       <a href="posts.html">posts</a>
-       <a href="CommonThreats.html">Common Threats</a>
+      <a href="posts.html">posts</a>
+      <a href="CommonThreats.html">Common Threats</a>
+
+      <!-- logout button styled differently -->
       <a href="logout.html" class="logout-btn">Log Out</a>
     </div>
   </nav>
 
+  <!-- main page heading -->
   <h1>Upload Files for Virus Scan</h1>
 
+  <!-- upload form -->
   <form id="uploadForm" enctype="multipart/form-data" class="panel">
+
+    <!-- hidden file input for selecting individual files -->
     <input type="file" id="fileInput" multiple hidden />
+
+    <!-- hidden folder input for selecting an entire folder -->
     <input type="file" id="folderInput" webkitdirectory multiple hidden />
 
+    <!-- drag and drop upload area -->
     <div id="dropzone"
          class="dropzone"
          role="button"
          tabindex="0"
          aria-label="File upload dropzone. Press Enter to choose files, or use the Choose Folder button.">
+
+      <!-- main dropzone text -->
       <div>📁 Drop your files here</div>
+
+      <!-- smaller helper text -->
       <div class="hint">or choose files/folder</div>
 
+      <!-- buttons inside dropzone -->
       <div class="row" style="gap:10px; justify-content:center; margin-top:10px;">
         <button type="button" id="chooseFilesBtn" class="btn btn-ghost">Choose Files</button>
         <button type="button" id="chooseFolderBtn" class="btn btn-ghost">Choose Folder</button>
       </div>
+
+      <!-- area where selected file names will appear -->
       <div id="fileName" aria-live="polite"></div>
     </div>
 
+    <!-- action buttons below dropzone -->
     <div class="row">
+      <!-- submits form and starts scan -->
       <button type="submit" class="btn btn-primary">Upload &amp; Scan</button>
+
+      <!-- clears selected files/results -->
       <button type="button" id="clearBtn" class="btn btn-ghost">Clear</button>
     </div>
   </form>
 
+  <!-- result panel for showing scan output -->
   <div id="result" class="panel" aria-live="polite" style="display:none;"></div>
 
+  <!-- navigation controls for moving between multiple scan results -->
   <div id="navControls" class="row panel" style="display:none; align-items:center; justify-content:space-between; gap:10px;">
     <button type="button" id="prevBtn" class="btn btn-ghost">Previous</button>
+
+    <!-- label showing current file/result position -->
     <div id="navLabel" class="muted" style="text-align:center; flex:1;"></div>
+
     <button type="button" id="nextBtn" class="btn btn-ghost">Next</button>
   </div>
 
+  <!-- details panel for showing more information about selected result -->
   <div id="details" class="panel" style="display:none;"></div>
+
 </body>
 </html>

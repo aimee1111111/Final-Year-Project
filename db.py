@@ -98,6 +98,7 @@ def save_scan_to_db(user_id: int, result: dict, scanned_at_dt: datetime, source_
         if conn:
             db_put_conn(conn)
 
+
 def get_history(user_id_int: int, limit: int = 200):
     conn = None
     try:

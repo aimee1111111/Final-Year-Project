@@ -1,35 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Basic page setup -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Page title shown in browser tab -->
   <title>Stay Safe Online — Cybersecurity Guide & Quiz</title>
 
+  <!-- Main stylesheet for the information page -->
   <link rel="stylesheet" href="information.css" />
+
+  <!-- JavaScript for quiz and password checker functionality -->
   <script src="information.js" defer></script>
 </head>
 <body>
+  <!-- Navigation bar -->
   <nav class="navbar">
     <div class="nav-left">
+      <!-- Website logo -->
       <h2 class="logo">ThreatCheck</h2>
     </div>
+
     <div class="nav-right">
+      <!-- Navigation links -->
       <a href="Home.html">Home</a>
       <a href="Information.html">Information</a>
       <a href="ScanHistory.html">Scan History</a>
-       <a href="posts.html">posts</a>
-       <a href="CommonThreats.html">Common Threats</a>
+      <a href="posts.html">posts</a>
+      <a href="CommonThreats.html">Common Threats</a>
       <a href="logout.html" class="logout-btn">Log Out</a>
     </div>
   </nav>
 
+  <!-- Main page content -->
   <main class="cyber container">
+
+    <!-- Hero section -->
     <header class="hero">
+
+      <!-- Intro card -->
       <div class="panel hero-card">
         <h1 class="hero-title">Stay Safe Online</h1>
         <p class="sub">
           Quick, practical guidance to dodge scams, protect your accounts, and keep your devices safe. Then test yourself with a short quiz.
         </p>
+
+        <!-- Call-to-action buttons -->
         <div class="hero-cta">
           <a class="btn btn-primary" href="#quiz">Take the Quiz</a>
           <a class="btn" href="#rules">See Key Rules</a>
@@ -37,6 +54,7 @@
         </div>
       </div>
 
+      <!-- Quick cyber tips card -->
       <div class="panel hero-card">
         <h3 class="no-top">Cyber Tips</h3>
         <ul class="tight">
@@ -49,9 +67,12 @@
       </div>
     </header>
 
+    <!-- Quick rules section -->
     <section id="rules" class="section-pad">
       <h2 class="section-title">Quick Safety Rules</h2>
+
       <div class="grid cards">
+        <!-- Phishing advice card -->
         <div class="panel card">
           <div class="eyebrow">Phishing</div>
           <h3>Verify before you click</h3>
@@ -63,6 +84,7 @@
           </ul>
         </div>
 
+        <!-- Password advice card -->
         <div class="panel card">
           <div class="eyebrow">Passwords</div>
           <h3>Use a manager + MFA</h3>
@@ -74,6 +96,7 @@
           </ul>
         </div>
 
+        <!-- Device advice card -->
         <div class="panel card">
           <div class="eyebrow">Devices</div>
           <h3>Update & backup</h3>
@@ -86,9 +109,11 @@
       </div>
     </section>
 
+    <!-- Common threats section -->
     <section class="section-pad">
       <h2 class="section-title">Common Threats</h2>
 
+      <!-- Phishing accordion -->
       <details class="accordion">
         <summary>
           <div class="title"><strong>Phishing</strong><span class="pill warn">Learn more ▸</span></div>
@@ -98,6 +123,7 @@
         </p>
       </details>
 
+      <!-- Ransomware accordion -->
       <details class="accordion">
         <summary>
           <div class="title"><strong>Ransomware</strong><span class="pill warn">Learn more ▸</span></div>
@@ -107,6 +133,7 @@
         </p>
       </details>
 
+      <!-- DoS/DDoS accordion -->
       <details class="accordion">
         <summary>
           <div class="title"><strong>Denial-of-service attack</strong><span class="pill warn">Learn more ▸</span></div>
@@ -116,6 +143,7 @@
         </p>
       </details>
 
+      <!-- Public Wi-Fi accordion -->
       <details class="accordion">
         <summary>
           <div class="title"><strong>Public Wi-Fi Risks</strong><span class="pill warn">Learn more ▸</span></div>
@@ -125,6 +153,7 @@
         </p>
       </details>
 
+      <!-- Social engineering accordion -->
       <details class="accordion">
         <summary>
           <div class="title"><strong>Social Engineering</strong><span class="pill warn">Learn more ▸</span></div>
@@ -132,6 +161,7 @@
         <p>
           Manipulation that convinces targets to take actions that expose confidential information, threaten finances, or compromise security.
         </p>
+
         <h4>🎣 Common Types of Phishing</h4>
         <ul class="tight">
           <li>🎯 <strong>Spear Phishing</strong> — Highly targeted attacks using personal details to appear legitimate.</li>
@@ -140,6 +170,7 @@
         </ul>
       </details>
 
+      <!-- Malware accordion -->
       <details class="accordion">
         <summary>
           <div class="title"><strong>Malware</strong><span class="pill warn">Learn more ▸</span></div>
@@ -147,6 +178,7 @@
         <p>
           Short for “malicious software” — code intentionally written to harm a computer system or its users.
         </p>
+
         <h3>Spot malware on your device:</h3>
         <ul class="tight">
           <li>⚠️ <strong>Unusual slowdowns</strong> — device suddenly runs much slower or overheats.</li>
@@ -157,7 +189,7 @@
       </details>
     </section>
 
-    <!-- Password Strength Checker -->
+    <!-- Password strength checker section -->
     <section id="checker" class="section-pad">
       <h2 class="section-title">
         Password Strength Checker <span class="eyebrow">(all local, no data leaves this page)</span>
@@ -165,19 +197,29 @@
 
       <div class="panel">
         <label for="pw" class="eyebrow">Try a sample password </label>
+
+        <!-- Password input -->
         <input id="pw" type="text" class="input" placeholder="Type here…" />
+
+        <!-- Strength meter -->
         <div class="meter"><span id="pwbar"></span></div>
+
+        <!-- Password feedback text -->
         <div id="pwtips" class="sub">Start typing to get tips…</div>
       </div>
     </section>
 
-    <!-- QUIZ -->
+    <!-- Quiz section -->
     <section id="quiz" class="section-pad">
       <h2 class="section-title">Cyber Safety Quiz</h2>
+
       <div class="panel quiz">
         <p class="sub zero">10 questions • Select the best answer, then submit at the bottom.</p>
+
+        <!-- Quiz questions will be inserted here by JavaScript -->
         <div id="qwrap"></div>
 
+        <!-- Quiz action buttons and score display -->
         <div class="quiz-actions">
           <button id="submitBtn" class="btn btn-primary">Submit Answers</button>
           <button id="resetBtn" class="btn btn-ghost">Reset</button>
@@ -190,10 +232,12 @@
       </div>
     </section>
 
-    <!-- Resources -->
+    <!-- Trusted resources section -->
     <section class="section-pad">
       <h2 class="section-title">Trusted Resources</h2>
+
       <div class="grid cards two">
+        <!-- National advice links -->
         <div class="panel card">
           <h3>National advice</h3>
           <ul class="tight">
@@ -203,10 +247,11 @@
           </ul>
         </div>
 
+        <!-- Advice on checking links and emails -->
         <div class="panel card">
           <h3>Check a link or email</h3>
           <ul class="tight">
-            <li>Right-click → Copy link</span> then paste to inspect domain.</li>
+            <li>Right-click → Copy link then paste to inspect domain.</li>
             <li>Search the sender’s domain on the web to verify legitimacy.</li>
             <li>Use ThreatCheck to test emails, files, and URLs for threats.</li>
             <li>Report suspicious emails to your provider or IT team.</li>

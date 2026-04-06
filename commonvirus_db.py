@@ -1,4 +1,3 @@
-# commonvirus_db.py
 import os
 from typing import Optional, List, Dict, Any
 

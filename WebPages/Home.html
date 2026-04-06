@@ -1,46 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Basic page setup -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Page title shown in browser tab -->
   <title>ThreatCheck | Home</title>
+
+  <!-- Main homepage stylesheet -->
   <link rel="stylesheet" href="Home.css" />
+
+  <!-- Styles for the URL checker section -->
   <link rel="stylesheet" href="urlChecker.css" />
+
+  <!-- Styles for the phishing/email checker bot -->
   <link rel="stylesheet" href="Aibot.css" />
 </head>
 <body>
+  <!-- Background grid effect -->
   <div class="grid-bg"></div>
+
+  <!-- Decorative glowing orb -->
   <div class="orb orb1"></div>
+
+  <!-- Second decorative glowing orb -->
   <div class="orb orb2"></div>
 
+  <!-- Main page container -->
   <div class="container">
-   <nav class="navbar">
-    <div class="nav-left">
-      <h2 class="logo">ThreatCheck</h2>
-    </div>
-     <div class="nav-right">
-      <a href="Home.html">Home</a>
-      <a href="Information.html">Information</a>
-      <a href="ScanHistory.html">Scan History</a>
-       <a href="posts.html">posts</a>
-       <a href="CommonThreats.html">Common Threats</a>
-      <a href="logout.html" class="logout-btn">Log Out</a>
-    </div>
-  </nav>
 
+    <!-- Navigation bar -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <!-- Website logo -->
+        <h2 class="logo">ThreatCheck</h2>
+      </div>
+
+      <div class="nav-right">
+        <!-- Navigation links -->
+        <a href="Home.html">Home</a>
+        <a href="Information.html">Information</a>
+        <a href="ScanHistory.html">Scan History</a>
+        <a href="posts.html">Posts</a>
+        <a href="CommonThreats.html">Common Threats</a>
+        <a href="logout.html" class="logout-btn">Log Out</a>
+      </div>
+    </nav>
+
+    <!-- Main homepage content -->
     <div class="main-content">
+
+      <!-- Welcome / hero section -->
       <div class="hero-section">
+
+        <!-- Login success badge -->
         <div class="status-badge">
           <span class="status-dot"></span>
           Logged In Successfully
         </div>
+
+        <!-- Main heading -->
         <h1>Welcome to ThreatCheck</h1>
+
+        <!-- Introductory text -->
         <p class="subtitle">
           Your security command center is ready. Scan files, analyze URLs, and monitor threats in real-time with advanced detection algorithms.
         </p>
       </div>
 
+      <!-- Main action cards -->
       <div class="action-cards">
+
+        <!-- File scanning card -->
         <a href="files.html" class="card">
           <div class="card-icon">📄</div>
           <h3>Scan Files</h3>
@@ -48,6 +80,7 @@
           <span class="card-arrow">→</span>
         </a>
 
+        <!-- URL checking card -->
         <div class="card" id="urlButton" role="button" tabindex="0" aria-controls="urlInputBox" aria-expanded="false">
           <div class="card-icon">🔗</div>
           <h3>Check URL</h3>
@@ -55,6 +88,7 @@
           <span class="card-arrow">→</span>
         </div>
 
+        <!-- Email/phishing checking card -->
         <div class="card" id="emailCard" role="button" tabindex="0" aria-controls="checkerPanel" aria-expanded="false">
           <div class="card-icon">📧</div>
           <h3>Check Email for phishing</h3>
@@ -63,42 +97,74 @@
         </div>
       </div>
 
+      <!-- Hidden URL checker input box -->
       <div id="urlInputBox" class="url-input-box" style="display:none;">
         <label for="urlInput">Paste your link:</label>
-        <input type="url" id="urlInput" placeholder="Enter URL here" inputmode="url" />
-        <button id="submitUrl" type="button">Check Safety</button>
+
+        <!-- URL input row with buttons -->
+        <div class="url-input-row">
+          <input type="url" id="urlInput" placeholder="Enter URL here" inputmode="url" />
+          <button id="submitUrl" type="button">Check Safety</button>
+          <button id="clearUrl" type="button" class="clear-btn">Clear</button>
+        </div>
+
+        <!-- URL result message area -->
         <p id="resultMessage"></p>
       </div>
 
-  <!--AI checker panel -->
-  <div class="checker-panel" id="checkerPanel" style="display:none;">
-    <div class="checker-header">
-      <div class="checker-header-left">
-        <div class="checker-icon">🔍</div>
-        <div>
-          <div class="checker-title">Phishing & Scam Detector</div>
-          <div class="checker-subtitle">Analyze email text and messages</div>
+      <!-- Hidden phishing checker panel -->
+      <div class="checker-panel" id="checkerPanel" style="display:none;">
+
+        <!-- Checker panel header -->
+        <div class="checker-header">
+          <div class="checker-header-left">
+
+            <!-- Checker icon -->
+            <div class="checker-icon">🔍</div>
+
+            <div>
+              <!-- Checker title -->
+              <div class="checker-title">Phishing & Scam Detector</div>
+
+              <!-- Checker subtitle -->
+              <div class="checker-subtitle">Analyze email text and messages</div>
+            </div>
+          </div>
+
+          <!-- Close button for checker panel -->
+          <button class="checker-close" id="checkerClose" type="button" aria-label="Close">✕</button>
+        </div>
+
+        <!-- Main checker message display area -->
+        <div class="checker-body" id="checkerBody">
+
+          <!-- Default bot message -->
+          <div class="checker-msg bot">
+            👋 Paste suspicious email/message text and I’ll assess phishing risk, urgency language, impersonation clues, and social-engineering patterns.
+          </div>
+        </div>
+
+        <!-- Input area for message analysis -->
+        <div class="checker-input-area">
+          <label class="checker-label" for="checkerInput">Paste email content or message:</label>
+
+          <!-- Textarea for pasted email/message -->
+          <textarea id="checkerInput" class="checker-textarea" placeholder="Example: Dear Customer, Your account has been suspended. Click here to verify..."></textarea>
+
+          <!-- Button to trigger phishing analysis -->
+          <button id="checkerSend" class="checker-send" type="button">🔍 Analyze for Threats</button>
         </div>
       </div>
-      <button class="checker-close" id="checkerClose" type="button" aria-label="Close">✕</button>
-    </div>
-
-    <div class="checker-body" id="checkerBody">
-      <div class="checker-msg bot">
-        👋 Paste suspicious email/message text and I’ll assess phishing risk, urgency language, impersonation clues, and social-engineering patterns.
-      </div>
-    </div>
-
-    <div class="checker-input-area">
-      <label class="checker-label" for="checkerInput">Paste email content or message:</label>
-      <textarea id="checkerInput" class="checker-textarea" placeholder="Example: Dear Customer, Your account has been suspended. Click here to verify..."></textarea>
-      <button id="checkerSend" class="checker-send" type="button">🔍 Analyze for Threats</button>
     </div>
   </div>
 
+  <!-- URL checker JavaScript -->
   <script type="module" src="url-checker.js"></script>
-  
+
+  <!-- Phishing checker JavaScript -->
   <script src="checker.js" defer></script>
+
+  <!-- Homepage interaction JavaScript -->
   <script src="home.js" defer></script>
 </body>
 </html>

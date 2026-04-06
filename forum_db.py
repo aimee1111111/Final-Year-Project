@@ -1,8 +1,17 @@
-# forum_db.py
+"""
+Forum database helper
+
+This file handles the database queries for the forum feature.
+It creates and retrieves posts and replies from the PostgreSQL database,
+so the rest of the app can show forum discussions, search posts,
+and let users add new posts or replies.
+"""
+
 from psycopg2.extras import RealDictCursor
 from db import db_get_conn, db_put_conn
 
 
+# Creates a new forum post and returns the saved row
 def create_post(user_id: int, title: str, body: str) -> dict:
     conn = None
     try:
@@ -24,6 +33,7 @@ def create_post(user_id: int, title: str, body: str) -> dict:
             db_put_conn(conn)
 
 
+# Returns a list of recent posts, with optional search filtering
 def list_posts(limit: int = 50, q: str | None = None) -> list[dict]:
     conn = None
     try:
@@ -59,6 +69,7 @@ def list_posts(limit: int = 50, q: str | None = None) -> list[dict]:
             db_put_conn(conn)
 
 
+# Returns posts created by one specific user, with optional search filtering
 def list_posts_by_user(user_id: int, limit: int = 200, q: str | None = None) -> list[dict]:
     conn = None
     try:
@@ -96,6 +107,7 @@ def list_posts_by_user(user_id: int, limit: int = 200, q: str | None = None) -> 
             db_put_conn(conn)
 
 
+# Gets one post by its id
 def get_post(post_id: int) -> dict | None:
     conn = None
     try:
@@ -115,6 +127,7 @@ def get_post(post_id: int) -> dict | None:
             db_put_conn(conn)
 
 
+# Gets all replies for a specific post
 def list_replies(post_id: int, limit: int = 200) -> list[dict]:
     conn = None
     try:
@@ -136,6 +149,7 @@ def list_replies(post_id: int, limit: int = 200) -> list[dict]:
             db_put_conn(conn)
 
 
+# Creates a new reply for a post and returns the saved row
 def create_reply(post_id: int, user_id: int, body: str) -> dict:
     conn = None
     try:

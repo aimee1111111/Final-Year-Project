@@ -63,28 +63,35 @@
 
     const buttons = bar.querySelectorAll(".fb-btn");
     const status = bar.querySelector(".fb-status");
+    let submitted = false;
 
     buttons.forEach((btn) => {
       btn.addEventListener("click", async () => {
-        const label = Number(btn.getAttribute("data-label"));
-        if (!lastAnalyzedText) return;
+        if (submitted || !lastAnalyzedText) return;
 
+        const label = Number(btn.getAttribute("data-label"));
         buttons.forEach((b) => (b.disabled = true));
-        status.textContent = "Sending feedback…";
+        status.textContent = "Sending feedback...";
 
         try {
           const res = await fetch(`${API_BASE}/feedback`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: lastAnalyzedText, label })
+            body: JSON.stringify({
+              text: lastAnalyzedText.trim(),
+              label
+            })
           });
 
           const ct = res.headers.get("content-type") || "";
           let data = null;
           let raw = "";
 
-          if (ct.includes("application/json")) data = await res.json();
-          else raw = await res.text();
+          if (ct.includes("application/json")) {
+            data = await res.json();
+          } else {
+            raw = await res.text();
+          }
 
           if (!res.ok) {
             const msg =
@@ -93,7 +100,15 @@
             throw new Error(msg);
           }
 
-          status.textContent = "Thanks — model updated!";
+          submitted = true;
+
+          if (data.retrained_batch) {
+            status.textContent = "Thanks — saved, online updated, and batch retrained.";
+          } else if (data.rebuilt_online) {
+            status.textContent = "Thanks — saved and online model rebuilt from feedback.";
+          } else {
+            status.textContent = "Thanks — feedback saved and model updated.";
+          }
         } catch (err) {
           console.error("Feedback error:", err);
           status.textContent = `Feedback failed: ${err.message}`;
@@ -104,7 +119,7 @@
   }
 
   async function analyzeContent(content) {
-    const text = (content || "").trim();
+    const text = (content || "").replace(/\s+/g, " ").trim();
     if (!text) return;
 
     input.value = "";
@@ -129,8 +144,11 @@
       let data = null;
       let raw = "";
 
-      if (ct.includes("application/json")) data = await res.json();
-      else raw = await res.text();
+      if (ct.includes("application/json")) {
+        data = await res.json();
+      } else {
+        raw = await res.text();
+      }
 
       if (!res.ok) {
         const msg =
@@ -148,17 +166,18 @@
     } catch (err) {
       thinking.remove();
       console.error("Analysis error:", err);
-      appendMsg("❌ Unable to connect to analysis service. Ensure Flask is running on port 5050 and CORS is enabled.", "bot");
+      appendMsg("❌ Unable to connect to analysis service. Make sure Flask is running on port 5050.", "bot");
     } finally {
       sendBtn.disabled = false;
+      input.focus();
     }
   }
 
   function init() {
     if (!ensureElements()) return;
 
-    // Open panel from card
     emailCard.addEventListener("click", openPanel);
+
     emailCard.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -166,18 +185,15 @@
       }
     });
 
-    // Close panel
     closeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       closePanel();
     });
 
-    // Send analysis
     sendBtn.addEventListener("click", () => analyzeContent(input.value));
 
-    // Ctrl+Enter submit
     input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && e.ctrlKey) {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         analyzeContent(input.value);
       }

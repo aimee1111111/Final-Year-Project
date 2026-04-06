@@ -1,19 +1,27 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Basic page setup -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <!-- Page title shown in browser tab -->
     <title>Advice Board</title>
+
+    <!-- External stylesheet for the posts page -->
     <link rel="stylesheet" href="posts.css" />
   </head>
 
   <body>
+    <!-- Navigation bar -->
     <nav class="navbar">
       <div class="nav-left">
+        <!-- Website logo -->
         <h2 class="logo">ThreatCheck</h2>
       </div>
 
       <div class="nav-right">
+        <!-- Navigation links -->
         <a href="Home.html">Home</a>
         <a href="Information.html">Information</a>
         <a href="ScanHistory.html">Scan History</a>
@@ -23,29 +31,41 @@
       </div>
     </nav>
 
+    <!-- Page header -->
     <header class="page-header">
       <div class="header-text">
+        <!-- Main page title -->
         <div class="title">Advice Board</div>
+
+        <!-- Short page description -->
         <div class="subtitle">Ask questions, share advice, discuss threats safely</div>
       </div>
     </header>
 
+    <!-- Main page layout -->
     <main class="layout">
+
+      <!-- Sidebar navigation -->
       <aside class="sidebar">
         <button id="tabAll" class="tab active" type="button">All Posts</button>
         <button id="tabMine" class="tab" type="button">My Posts</button>
         <button id="tabNew" class="tab" type="button">Create Post</button>
       </aside>
 
+      <!-- Main content area -->
       <section class="content">
+
+        <!-- Toast notification area -->
         <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
+        <!-- Post list view -->
         <div id="viewList" class="panel">
           <div class="panelhead">
             <h2 id="listTitle">All Posts</h2>
 
             <div class="spacer"></div>
 
+            <!-- Search bar -->
             <div class="searchbar">
               <input
                 id="searchInput"
@@ -57,17 +77,21 @@
               <button id="clearSearch" class="btn ghost" type="button">Clear</button>
             </div>
 
+            <!-- Refresh button -->
             <button id="refreshList" class="btn ghost" type="button">Refresh</button>
           </div>
 
+          <!-- Posts will be loaded here -->
           <div id="posts" class="posts"></div>
         </div>
 
+        <!-- Create new post view -->
         <div id="viewNew" class="panel hidden">
           <div class="panelhead">
             <h2>Create a Post</h2>
           </div>
 
+          <!-- New post form -->
           <form id="newPostForm" class="form">
             <label for="newTitle">Title</label>
             <input
@@ -84,6 +108,7 @@
               placeholder="Describe the threat / question and what you’ve tried"
             ></textarea>
 
+            <!-- Form action buttons -->
             <div class="row">
               <button type="submit" class="btn primary">Publish</button>
               <button type="button" id="cancelNew" class="btn ghost">Cancel</button>
@@ -91,23 +116,32 @@
           </form>
         </div>
 
+        <!-- Single post detail view -->
         <div id="viewDetail" class="panel hidden">
           <div class="panelhead">
+            <!-- Back to list button -->
             <button id="backToList" class="btn ghost" type="button">← Back</button>
             <div class="spacer"></div>
+
+            <!-- Refresh post detail button -->
             <button id="refreshDetail" class="btn ghost" type="button">Refresh</button>
           </div>
 
+          <!-- Detailed post content -->
           <article class="postdetail">
             <h2 id="detailTitle"></h2>
             <div id="detailMeta" class="meta"></div>
             <div id="detailBody" class="body"></div>
           </article>
 
+          <!-- Replies section -->
           <section class="replies">
             <h3>Replies</h3>
+
+            <!-- Replies will be inserted here -->
             <div id="replyList" class="replylist"></div>
 
+            <!-- Reply form -->
             <form id="replyForm" class="form">
               <label for="replyBody">Reply</label>
               <textarea
@@ -122,6 +156,7 @@
       </section>
     </main>
 
+    <!-- JavaScript for the posts page -->
     <script src="posts.js"></script>
   </body>
 </html>

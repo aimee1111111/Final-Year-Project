@@ -1,3 +1,4 @@
+/* Global colours, backgrounds, borders, and shadow variables */
 :root {
   --bg-primary: #0a0e27;
   --accent-cyan: #00f5ff;
@@ -5,36 +6,41 @@
   --text-primary: #fff;
   --text-secondary: #a8b2d1;
   --grid-color: rgba(0, 245, 255, 0.1);
-
   --border-soft: rgba(255, 255, 255, 0.12);
   --border-cyan: rgba(0, 245, 255, 0.35);
   --panel-bg: rgba(21, 25, 52, 0.75);
   --input-bg: rgba(10, 14, 39, 0.7);
-
-  --shadow-neon: 0 0 25px rgba(0, 245, 255, 0.15);
-  --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.45);
+  --shadow-neon: 0 0 40px rgba(0, 245, 255, 0.18);
+  --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
+/* Reset browser default spacing and use border-box sizing */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body { min-height: 100vh; }
+/* Make page stretch to full width and viewport height */
+html, body {
+  width: 100%;
+  min-height: 100vh;
+}
 
+/* Main page styling */
 body {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
-  position: relative;
-  display: grid;
-  place-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
   padding: 24px;
 }
 
-/* background layers */
+/* Decorative background layers */
 body::before,
 body::after {
   content: "";
@@ -43,159 +49,211 @@ body::after {
   pointer-events: none;
 }
 
+/* Animated grid background */
 body::before {
   background-image:
     linear-gradient(var(--grid-color) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
   background-size: 50px 50px;
   animation: gridMove 20s linear infinite;
-  z-index: -3;
-}
-
-body::after {
-  background:
-    radial-gradient(circle at 85% 5%, rgba(0,245,255,.22) 0 220px, transparent 320px),
-    radial-gradient(circle at 8% 92%, rgba(255,0,110,.22) 0 260px, transparent 360px);
-  filter: blur(20px);
   z-index: -2;
 }
 
+/* Blurred glowing background accents */
+body::after {
+  background:
+    radial-gradient(circle at 85% 5%, rgba(0, 245, 255, 0.22) 0 220px, transparent 320px),
+    radial-gradient(circle at 8% 92%, rgba(255, 0, 110, 0.22) 0 260px, transparent 360px);
+  filter: blur(20px);
+  z-index: -1;
+}
+
+/* Grid movement animation */
 @keyframes gridMove {
   to { transform: translate(50px, 50px); }
 }
 
-/* card */
-.container {
-  width: min(100%, 420px);
-  background: var(--panel-bg);
-  border: 1px solid var(--border-cyan);
-  border-radius: 18px;
-  padding: 38px 30px;
-  text-align: center;
-  backdrop-filter: blur(8px);
-  box-shadow: var(--shadow-neon), var(--shadow-soft);
-  animation: fadeIn .35s ease-in-out;
-  transition: transform .25s ease, box-shadow .25s ease;
-}
-
-.container:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 35px rgba(0, 245, 255, .2), var(--shadow-soft);
-}
-
-/* heading */
-h2 {
-  margin-bottom: 24px;
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(1.8rem, 4vw, 2.3rem);
-  line-height: 1.1;
-  letter-spacing: -.3px;
-  background: linear-gradient(135deg, #fff, var(--text-secondary));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* form */
-.form-group {
-  margin-bottom: 14px;
-  text-align: left;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 7px;
-  font-size: .93rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-input,
-button {
-  width: 100%;
-  border-radius: 10px;
-  font: 700 .95rem 'JetBrains Mono', monospace;
-}
-
-input {
-  padding: 12px 13px;
-  border: 1px solid var(--border-soft);
-  background: var(--input-bg);
-  color: var(--text-primary);
-  font-weight: 500;
-  outline: 0;
-  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
-}
-
-input::placeholder {
-  color: color-mix(in srgb, var(--text-secondary) 82%, #fff 18%);
-}
-
-input:focus {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 0 3px rgba(0,245,255,.2);
-  transform: translateY(-1px);
-}
-
-button {
-  margin-top: 16px;
-  padding: 12px 0;
-  border: 0;
-  cursor: pointer;
-  color: #fff;
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
-  box-shadow: 0 8px 24px rgba(0, 245, 255, .22);
-  transition: transform .2s ease, box-shadow .25s ease;
-}
-
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(255, 0, 110, .25);
-}
-
-button:active { transform: translateY(1px); }
-
-button:focus-visible {
-  outline: 0;
-  box-shadow:
-    0 0 0 3px rgba(0,245,255,.35),
-    0 12px 28px rgba(255, 0, 110, .25);
-}
-
-.error {
-  display: none;
-  margin-bottom: 16px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  text-align: left;
-  font-size: .92rem;
-  font-weight: 600;
-  color: #ffe6eb;
-  background: rgba(255, 0, 110, .18);
-  border: 1px solid rgba(255, 0, 110, .5);
-  box-shadow: 0 8px 18px rgba(255, 0, 110, .18);
-}
-
-a {
-  color: var(--accent-cyan);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: color .2s ease;
-}
-a:hover { color: var(--text-primary); }
-
+/* Fade-in animation for the login card */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+/* Main login card container */
+.container {
+  width: min(92vw, 620px);
+  padding: 56px 48px 46px;
+  text-align: center;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-cyan);
+  border-radius: 22px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-neon), var(--shadow-soft);
+  animation: fadeIn 0.4s ease-out;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* Hover effect for the card */
+.container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 50px rgba(0, 245, 255, 0.22), var(--shadow-soft);
+}
+
+/* Main heading */
+h2 {
+  font-family: "Syne", sans-serif;
+  font-size: clamp(2.8rem, 6vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff, var(--text-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 36px;
+}
+
+/* Decorative line under heading */
+h2::after {
+  content: "";
+  display: block;
+  width: 52px;
+  height: 3px;
+  margin: 14px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+}
+
+/* Form layout */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Shared input field styling */
+input {
+  width: 100%;
+  padding: 18px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 1.15rem;
+  font-weight: 500;
+  font-family: "JetBrains Mono", monospace;
+  outline: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+/* Placeholder text styling */
+input::placeholder {
+  color: rgba(168, 178, 209, 0.7);
+  font-size: 1.05rem;
+}
+
+/* Input focus styling */
+input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Submit button styling */
+button[type="submit"] {
+  width: 100%;
+  margin-top: 10px;
+  padding: 18px 0;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+  box-shadow: 0 8px 28px rgba(0, 245, 255, 0.22);
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
+}
+
+/* Submit button hover effect */
+button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(255, 0, 110, 0.3);
+}
+
+/* Submit button pressed effect */
+button[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+/* Keyboard focus styling for button */
+button[type="submit"]:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.4), 0 14px 36px rgba(255, 0, 110, 0.3);
+}
+
+/* Error message text */
+#error-message {
+  margin-top: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Bottom paragraph text */
+.container p {
+  margin-top: 22px;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Link styling inside container */
+.container a {
+  color: var(--accent-cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+/* Link hover effect */
+.container a:hover {
+  color: #fff;
+}
+
+/* Mobile responsive styling */
 @media (max-width: 480px) {
-  body { padding: 16px; }
-  .container { padding: 28px 20px; border-radius: 14px; }
-  h2 { margin-bottom: 20px; font-size: 1.7rem; }
-  input, button { font-size: .92rem; }
+  body {
+    padding: 16px;
+  }
+
+  .container {
+    padding: 36px 24px 32px;
+    border-radius: 16px;
+  }
+
+  h2 {
+    font-size: 2.3rem;
+    margin-bottom: 28px;
+  }
+
+  input,
+  button[type="submit"] {
+    font-size: 1rem;
+    padding: 16px;
+  }
+
+  .container p {
+    font-size: 0.95rem;
+  }
+}
+
+/* Disable animations and transitions for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

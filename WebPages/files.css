@@ -1,5 +1,11 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* Reset default spacing and use border-box sizing everywhere */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+/* Global colour, spacing, shadow, and radius variables */
 :root {
   --bg-primary: #0a0e27;
   --bg-secondary: #151934;
@@ -9,10 +15,13 @@
   --text-primary: #ffffff;
   --text-secondary: #a8b2d1;
   --grid-color: rgba(0, 245, 255, 0.1);
+
   --border-soft: rgba(255, 255, 255, 0.12);
   --border-cyan: rgba(0, 245, 255, 0.35);
+
   --panel-bg: rgba(21, 25, 52, 0.75);
   --input-bg: rgba(10, 14, 39, 0.7);
+
   --shadow-neon: 0 0 25px rgba(0, 245, 255, 0.15);
   --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.45);
 
@@ -24,31 +33,36 @@
   --slate-2: #cbd5e1;
   --slate-3: #334155;
 
-  --nav-h: 72px;
+  --nav-h: 78px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
 }
 
-html, body {
+/* Make page fill viewport height and allow scrolling */
+html,
+body {
   min-height: 100vh;
-  height: auto;
   overflow-y: auto;
 }
 
+/* Main page styling */
 body {
   font-family: "JetBrains Mono", monospace;
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
   position: relative;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: 20px;
-  padding: 92px 16px 60px;
+  padding: calc(var(--nav-h) + 20px) 16px 60px;
   text-align: center;
 }
 
+/* Fixed decorative background layers */
 body::before,
 body::after {
   content: "";
@@ -57,6 +71,7 @@ body::after {
   pointer-events: none;
 }
 
+/* Animated grid background */
 body::before {
   background-image:
     linear-gradient(var(--grid-color) 1px, transparent 1px),
@@ -66,6 +81,7 @@ body::before {
   z-index: -3;
 }
 
+/* Blurred glowing background accents */
 body::after {
   background:
     radial-gradient(circle at 85% 5%, rgba(0, 245, 255, 0.22) 0 220px, transparent 320px),
@@ -74,98 +90,138 @@ body::after {
   z-index: -2;
 }
 
-@keyframes gridMove { to { transform: translate(50px, 50px); } }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* Moves grid background slowly */
+@keyframes gridMove {
+  to {
+    transform: translate(50px, 50px);
+  }
+}
 
-/* Navbar */
+/* Small fade-up entrance animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Top navigation bar */
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 14px 28px;
-  background: rgba(21, 25, 52, 0.7);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-soft);
-  box-shadow: var(--shadow-soft);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px;
+    background: rgba(21, 25, 52, 0.7);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-soft);
+    z-index: 1000;
+    box-shadow: var(--shadow-soft);
+    min-height: var(--nav-h);
 }
 
-.logo,
-h1 {
-  font-family: "Syne", sans-serif;
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
+/* Site logo styling */
 .logo {
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: -0.4px;
+    margin: 0;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
 }
 
+/* Right side nav links container */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Nav link styling */
 .nav-right a {
-  margin-left: 20px;
-  text-decoration: none;
-  color: var(--text-secondary);
-  font-weight: 500;
-  position: relative;
-  transition: 0.25s;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 1.4rem;
+    position: relative;
+    transition: color 0.25s ease;
+    margin-left: 0;
 }
 
+/* Animated underline for nav links */
 .nav-right a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -5px;
-  width: 0;
-  height: 2px;
-  background: var(--accent-cyan);
-  transition: width 0.25s;
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0;
+    height: 2px;
+    background: var(--accent-cyan);
+    transition: width 0.25s ease;
 }
 
-.nav-right a:hover { color: var(--text-primary); }
-.nav-right a:hover::after { width: 100%; }
+/* Nav link hover colour */
+.nav-right a:hover {
+    color: var(--text-primary);
+}
 
+/* Expand underline on hover */
+.nav-right a:hover::after {
+    width: 100%;
+}
+
+/* Logout button styling */
 .logout-btn {
-  background: transparent;
-  border: 1px solid var(--accent-magenta);
-  color: var(--accent-magenta) !important;
-  padding: 8px 15px;
-  border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--accent-magenta);
+    color: var(--accent-magenta) !important;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: all 0.25s ease;
 }
 
+/* Logout button hover effect */
 .logout-btn:hover {
-  background: var(--accent-magenta);
-  color: #fff !important;
-  box-shadow: 0 0 18px rgba(255, 0, 110, 0.45);
+    background: var(--accent-magenta);
+    color: #fff !important;
+    box-shadow: 0 0 18px rgba(255, 0, 110, 0.45);
 }
 
-/* Layout */
+/* Shared content width wrapper */
 .wrap {
-  width: min(1320px, calc(100% - 32px));
-  margin: 0 auto;
+    width: min(1100px, calc(100% - 48px));
+    margin: 0 auto;
 }
 
+/* Sticky top section under navbar */
 .topbar {
-  position: sticky;
-  top: var(--nav-h);
-  z-index: 100;
-  background: rgba(21, 25, 52, 0.62);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-soft);
+    position: sticky;
+    top: var(--nav-h);
+    z-index: 100;
+    background: rgba(21, 25, 52, 0.62);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-soft);
 }
 
-.topbar .wrap { padding: 18px 0 16px; }
+/* Padding inside sticky topbar */
+.topbar .wrap {
+    padding: 18px 0 16px;
+}
 
+/* Main two-column grid layout */
 main.wrap.grid {
   display: grid;
   grid-template-columns: 1fr 1.25fr;
@@ -175,111 +231,145 @@ main.wrap.grid {
   padding-bottom: 60px;
 }
 
-/* Panels */
+/* Main page heading */
 h1 {
   font-size: clamp(2rem, 5vw, 3.3rem);
   line-height: 1.1;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
   letter-spacing: -0.5px;
+  word-break: break-word;
 }
 
-.panel {
-  background: var(--panel-bg);
-  border: 1px solid var(--border-soft);
-  border-radius: 16px;
-  padding: 24px 28px;
-  backdrop-filter: blur(6px);
+/* Shared rounded corners and shadow for major panels/cards */
+.panel,
+form#uploadForm,
+.scan-result-card,
+.threat-alert,
+.safe-summary,
+.action-box,
+.technical-panel,
+.meta-card,
+.engine,
+#result {
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
 }
 
-/* Upload form */
+/* Shared styling for panels and upload form */
+.panel,
 form#uploadForm {
-  width: 520px;
-  max-width: 95%;
-  animation: fadeInUp 0.3s ease-in-out;
-  border: 1px solid var(--border-cyan);
-  box-shadow: var(--shadow-neon), var(--shadow-soft);
-  transition: 0.25s;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(6px);
+  padding: 24px 28px;
 }
 
+/* Upload form styling */
+form#uploadForm {
+  width: min(1000px, 100%);
+  max-width: 100%;
+  border-color: var(--border-cyan);
+  box-shadow: var(--shadow-neon), var(--shadow-soft);
+  animation: fadeInUp 0.3s ease-in-out;
+  transition: 0.25s;
+  padding: 38px 46px;
+}
+
+/* Upload form hover effect */
 form#uploadForm:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 35px rgba(0, 245, 255, 0.18), var(--shadow-soft);
 }
 
+/* Row layout used in forms/buttons */
 .row {
   display: flex;
-  gap: 10px;
+  gap: 50px;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   margin-top: 28px;
 }
 
+/* Large button sizing inside rows */
 .row .btn,
 .row button[type="submit"] {
-  margin-top: 0;
-  height: 46px;
-  padding: 0 22px;
+  min-height: 80px;
+  padding: 0 36px;
   display: inline-flex;
   align-items: center;
-  line-height: 1;
+  justify-content: center;
 }
 
-/* Buttons */
+/* Base button styling */
 .btn,
 button[type="submit"] {
-  border-radius: 10px;
-  font: 700 0.95rem "JetBrains Mono", monospace;
+  border-radius: var(--radius-sm);
+  font: 700 1.8rem "JetBrains Mono", monospace;
   cursor: pointer;
   transition: 0.25s;
 }
 
+/* Link-style button layout */
 .btn {
   display: inline-flex;
   justify-content: center;
-  padding: 12px 18px;
+  padding: 16px 32px;
   border: 1px solid transparent;
   text-decoration: none;
 }
 
+/* Click-down effect */
 .btn:active,
-button[type="submit"]:active { transform: translateY(1px); }
-
-.btn:focus-visible,
-button[type="submit"]:focus-visible {
-  outline: 0;
-  box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.35), 0 0 20px rgba(0, 245, 255, 0.2);
+button[type="submit"]:active {
+  transform: translateY(1px);
 }
 
+/* Focus styling for accessibility */
+.btn:focus-visible,
+button[type="submit"]:focus-visible,
+.dropzone:focus-visible,
+.kv input[type="text"]:focus {
+  outline: 0;
+  box-shadow:
+    0 0 0 3px rgba(0, 245, 255, 0.35),
+    0 0 20px rgba(0, 245, 255, 0.2);
+}
+
+/* Disabled button styling */
 .btn[disabled],
 button[type="submit"][disabled] {
   opacity: 0.65;
   cursor: not-allowed;
 }
 
+/* Primary button styling */
 .btn-primary {
   background: linear-gradient(135deg, var(--accent-cyan), #009cff);
   color: #031018;
   border-color: rgba(0, 245, 255, 0.6);
 }
 
+/* Primary button hover effect */
 .btn-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 24px rgba(0, 245, 255, 0.28);
 }
 
+/* Ghost button styling */
 .btn-ghost {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
   border-color: var(--border-soft);
 }
 
+/* Ghost button hover effect */
 .btn-ghost:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: var(--border-cyan);
 }
 
+/* Submit button styling */
 button[type="submit"] {
   margin-top: 16px;
   border: none;
@@ -289,26 +379,36 @@ button[type="submit"] {
   box-shadow: 0 8px 24px rgba(0, 245, 255, 0.22);
 }
 
+/* Submit button hover effect */
 button[type="submit"]:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 28px rgba(255, 0, 110, 0.25);
 }
 
-/* Dropzone / inputs */
-#fileInput { display: none; }
+/* Hide actual file input */
+#fileInput {
+  display: none;
+}
 
+/* Large drag-and-drop upload area */
 .dropzone {
   background: rgba(21, 25, 52, 0.75);
   border: 2px dashed rgba(0, 245, 255, 0.5);
-  border-radius: 16px;
-  padding: 38px 22px;
+  border-radius: var(--radius-lg);
+  padding: 90px 40px;
   cursor: pointer;
   user-select: none;
-  outline: none;
+  user-select: none;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03), var(--shadow-soft);
   transition: 0.25s;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
+/* Dropzone hover state */
 .dropzone:hover {
   transform: scale(1.015);
   background: rgba(21, 25, 52, 0.9);
@@ -316,40 +416,42 @@ button[type="submit"]:hover {
   box-shadow: 0 0 24px rgba(0, 245, 255, 0.16), var(--shadow-soft);
 }
 
-.dropzone:focus-visible {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.35), 0 0 26px rgba(0, 245, 255, 0.2);
-}
-
+/* Dropzone styling when file is dragged over it */
 .dropzone.dragover {
   border-color: var(--accent-yellow);
   background: rgba(255, 190, 11, 0.08);
   transform: scale(1.02);
 }
 
+/* Main text inside dropzone */
 .dropzone > div:first-child {
-  font-size: 1.15rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 16px;
 }
 
+/* Smaller helper text */
 .hint {
-  font-size: 0.9rem;
+  font-size: 1.7rem;
   color: var(--text-secondary);
+  line-height: 1.6;
 }
 
-/* Toggles */
+/* Container for result view toggle buttons */
 .view-toggle-container {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
   border-bottom: 2px solid #2d3748;
   padding-bottom: 12px;
+  flex-wrap: wrap;
 }
 
+/* Individual view toggle button */
 .view-toggle-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 10px 20px;
   background: transparent;
@@ -362,43 +464,56 @@ button[type="submit"]:hover {
   transition: all 0.2s;
 }
 
+/* View toggle hover effect */
 .view-toggle-btn:hover {
   background: rgba(148, 163, 184, 0.1);
   color: #e2e8f0;
 }
 
+/* Active view toggle button */
 .view-toggle-btn.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
+/* Icon inside toggle button */
 .view-toggle-btn svg {
   width: 16px;
   height: 16px;
 }
 
-.view-content { display: none; }
-.view-content.active { display: block; animation: fadeInUp 0.3s ease-in; }
-
-/* Scan result card */
-.scan-result-card {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 40px;
-  border-radius: 18px;
+/* Hidden view content by default */
+.view-content {
+  display: none;
 }
 
+/* Active view content */
+.view-content.active {
+  display: block;
+  animation: fadeInUp 0.3s ease-in;
+}
+
+/* Main scan result card */
+.scan-result-card {
+  max-width: 1400px;
+  width: min(95vw, 1400px);
+  margin: 0 auto;
+  padding: 40px;
+}
+
+/* Safe result styling */
 .scan-result-card.result-safe {
   border: 2px solid rgba(16, 185, 129, 0.3);
   background: linear-gradient(135deg, #1e3a2e 0%, #0f1a15 100%);
 }
 
+/* Dangerous result styling */
 .scan-result-card.result-danger {
   border: 2px solid rgba(239, 68, 68, 0.3);
   background: linear-gradient(135deg, #3a1e1e 0%, #1a0f0f 100%);
 }
 
+/* Top section of result card */
 .result-header {
   display: flex;
   align-items: center;
@@ -408,125 +523,149 @@ button[type="submit"]:hover {
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
-.result-icon { flex-shrink: 0; }
-.result-content { flex: 1; }
+/* Prevent result icon from shrinking */
+.result-icon {
+  flex-shrink: 0;
+}
 
+/* Flexible content sections */
+.result-content,
+.meta-info,
+.response-step-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Left align detailed content sections */
+.result-content,
+.threat-alert,
+.safe-summary,
+.action-box,
+.technical-panel,
+.meta-card,
+.engine,
+#result {
+  text-align: left;
+}
+
+/* Main result heading */
 .result-title {
   font-size: 32px;
   font-weight: 700;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   color: var(--slate-1);
+  word-break: break-word;
 }
 
-.result-safe .result-title { color: var(--safe); }
-.result-danger .result-title { color: var(--danger); }
+/* Safe result title colour */
+.result-safe .result-title {
+  color: var(--safe);
+}
 
+/* Dangerous result title colour */
+.result-danger .result-title {
+  color: var(--danger);
+}
+
+/* Scanned filename text */
 .result-filename {
   font-size: 16px;
   color: var(--muted);
   margin: 0;
   word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
-/* Status line inside #result (kept as your full bar design, removed duplicate old left-stripe version) */
+/* Status/result line container */
 #result {
-  margin-top: 16px;
-  min-height: 22px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  text-align: left;
-  font-size: 0.96rem;
+  margin-top: 20px;
+  min-height: 32px;
+  padding: 18px 22px;
+  font-size: 1.35rem;
+  font-weight: 700;
   overflow-wrap: anywhere;
   word-break: break-word;
-  background: rgba(10, 14, 39, 0.65);
+  background: rgba(10, 14, 39, 0.8);
   border: 1px solid var(--border-soft);
-  box-shadow: var(--shadow-soft);
 }
 
+/* Shared inner status badge layout */
 #result .ok,
 #result .bad {
   display: block;
   padding: 14px 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   margin-bottom: 10px;
   color: #fff;
   font-weight: 700;
 }
 
+/* Safe status message */
 #result .ok {
   background: rgba(16, 185, 129, 0.25);
   border: 1px solid rgba(16, 185, 129, 0.55);
   box-shadow: 0 0 18px rgba(16, 185, 129, 0.22);
 }
 
+/* Dangerous status message */
 #result .bad {
   background: rgba(239, 68, 68, 0.25);
   border: 1px solid rgba(239, 68, 68, 0.6);
   box-shadow: 0 0 18px rgba(239, 68, 68, 0.22);
 }
 
-/* Threat Alert */
+/* Shared spacing for alerts, summaries and technical sections */
+.threat-alert,
+.safe-summary,
+.action-box,
+.technical-panel {
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* Danger alert box */
 .threat-alert {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
 }
 
-.alert-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--danger-soft);
-  margin: 0 0 12px 0;
-}
-
-.alert-message {
-  font-size: 16px;
-  color: var(--slate-1);
-  margin: 0 0 20px 0;
-  line-height: 1.6;
-}
-
-.threat-details { margin: 20px 0; }
-
-.threat-details h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--slate-1);
-  margin: 0 0 12px 0;
-}
-
-.threat-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.threat-badge {
-  display: inline-block;
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: var(--danger-soft);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: "Courier New", monospace;
-}
-
-/* Safe Summary */
+/* Safe summary box */
 .safe-summary {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
 }
 
+/* Technical details panel */
+.technical-panel {
+  background: #1e293b;
+}
+
+/* Section titles */
+.alert-title,
+.technical-panel h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--slate-1);
+}
+
+/* Alert title colour */
+.alert-title {
+  color: var(--danger-soft);
+}
+
+/* Shared paragraph text styling */
+.alert-message,
+.scan-info,
+.action-box p,
+.response-step-desc {
+  font-size: 16px;
+  color: var(--slate-2);
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+
+/* Successful scan line */
 .scan-success {
   display: flex;
   align-items: center;
@@ -537,151 +676,57 @@ button[type="submit"]:hover {
   margin-bottom: 12px;
 }
 
-.scan-info {
-  font-size: 16px;
-  color: var(--slate-2);
-  margin: 0 0 20px 0;
-  line-height: 1.6;
-}
-
-/* Action boxes */
-.action-box {
-  background: rgba(148, 163, 184, 0.1);
-  border-radius: 10px;
-  padding: 20px;
-  margin-top: 20px;
-}
-
-.action-box.danger {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.action-box.safe {
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.action-box h4 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 12px 0;
-  color: var(--slate-1);
-}
-
-.action-box.danger h4 { color: var(--danger-soft); }
-.action-box.safe h4 { color: #6ee7b7; }
-
-.action-box p {
-  font-size: 15px;
-  color: var(--slate-2);
-  margin: 0;
-  line-height: 1.6;
-}
-
-.action-box ol {
-  margin: 12px 0 0 0;
-  padding-left: 20px;
-  color: var(--slate-2);
-  line-height: 1.8;
-}
-
-.action-box li { margin-bottom: 8px; }
-
-/* Scan Meta Grid */
-.scan-meta-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+/* Top margin for detail sections */
+.threat-details,
+.tech-section {
   margin-top: 24px;
 }
 
-.meta-card {
-  background: rgba(148, 163, 184, 0.05);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 10px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: all 0.2s;
-}
-
-.meta-card:hover {
-  background: rgba(148, 163, 184, 0.1);
-  border-color: rgba(148, 163, 184, 0.2);
-}
-
-.meta-card.success {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-}
-
-.meta-card.danger {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-.meta-icon {
-  font-size: 28px;
-  flex-shrink: 0;
-}
-
-.meta-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.meta-label {
-  font-size: 12px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-}
-
-.meta-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--slate-1);
-  word-break: break-word;
-}
-
-/* Technical View (kept) */
-.technical-panel {
-  background: #1e293b;
-  border-radius: 12px;
-  padding: 24px;
-}
-
-.technical-panel h3 {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--slate-1);
-  margin: 0 0 20px 0;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--slate-3);
-}
-
+/* Subheadings inside result sections */
+.threat-details h4,
+.action-box h4,
 .technical-panel h4 {
   font-size: 16px;
   font-weight: 600;
-  color: var(--slate-2);
-  margin: 20px 0 12px 0;
+  color: var(--slate-1);
+  margin: 0 0 12px;
 }
 
-.tech-section {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--slate-3);
-}
-
+/* Remove default list styling */
+.threat-list,
 .tech-threat-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+/* Threat badge list layout */
+.threat-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Shared code-like font styling for threat names */
+.threat-badge,
+.tech-threat-list li {
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Threat badge appearance */
+.threat-badge {
+  display: inline-block;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: var(--danger-soft);
+  padding: 8px 16px;
+  border-radius: 20px;
+}
+
+/* Technical threat list item styling */
 .tech-threat-list li {
   background: rgba(239, 68, 68, 0.1);
   border-left: 3px solid var(--danger);
@@ -689,90 +734,51 @@ button[type="submit"]:hover {
   margin-bottom: 8px;
   border-radius: 4px;
   color: var(--danger-soft);
-  font-family: "Courier New", monospace;
-  font-size: 14px;
 }
 
-/* Forms (kept) */
-.kv,
-.field {
-  display: grid;
-  gap: 10px 14px;
-  align-items: center;
+/* Shared action box */
+.action-box {
+  background: rgba(148, 163, 184, 0.1);
+  margin-top: 20px;
 }
 
-.kv { grid-template-columns: 140px minmax(0, 1fr); }
-
-.field {
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: 8px 12px;
-  margin: 6px 0;
+/* Safe action box */
+.action-box.safe {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.kv > label,
-.field > label {
-  font-weight: 600;
-  text-align: right;
-  color: var(--text-secondary);
-}
-
-.kv input[type="text"] {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border-soft);
-  background: var(--input-bg);
-  color: var(--text-primary);
-  outline: 0;
-  font-family: "JetBrains Mono", monospace;
-  transition: 0.2s;
-}
-
-.kv input[type="text"]:focus {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.2);
-}
-
-.kv input[readonly] { opacity: 0.95; }
-.kv input.ok { border-color: rgba(34, 197, 94, 0.7); }
-.kv input.bad { border-color: rgba(239, 68, 68, 0.7); }
-
-/* Misc (kept) */
-.engine {
-  margin: 10px 0;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border-soft);
-  background: rgba(21, 25, 52, 0.65);
-}
-
-.bad {
-  font-size: 1.4rem;
-  font-weight: 800;
-  line-height: 1.4;
-}
-
-.ok {
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-
-
+/* Danger action box */
 .action-box.danger {
-  margin-top: 1.25rem;
-  padding: 1.25rem;
-  border: 1px solid rgba(255, 90, 90, 0.35);
-  border-radius: 14px;
   background: rgba(120, 20, 20, 0.22);
+  border: 1px solid rgba(255, 90, 90, 0.35);
 }
 
+/* Safe action heading colour */
+.action-box.safe h4 {
+  color: #6ee7b7;
+}
+
+/* Danger action heading colour */
 .action-box.danger h4 {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  text-align: center;
   color: #ffb4a9;
+  text-align: center;
 }
 
+/* Numbered steps list */
+.action-box ol {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  color: var(--slate-2);
+  line-height: 1.8;
+}
+
+/* Space between list items */
+.action-box li {
+  margin-bottom: 8px;
+}
+
+/* Response step item layout */
 .response-step {
   display: flex;
   align-items: flex-start;
@@ -781,11 +787,13 @@ button[type="submit"]:hover {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Remove top border on first step */
 .response-step:first-of-type {
   border-top: none;
   padding-top: 0.2rem;
 }
 
+/* Step number circle */
 .response-step-number {
   flex-shrink: 0;
   width: 28px;
@@ -801,11 +809,7 @@ button[type="submit"]:hover {
   font-weight: 700;
 }
 
-.response-step-content {
-  flex: 1;
-  text-align: left;
-}
-
+/* Step title text */
 .response-step-title {
   font-size: 0.96rem;
   font-weight: 700;
@@ -814,39 +818,431 @@ button[type="submit"]:hover {
   margin-bottom: 0.25rem;
 }
 
-.response-step-desc {
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: rgba(255, 230, 230, 0.82);
+/* Grid layout for metadata cards */
+.scan-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
 }
-/* Responsive */
+
+/* Individual metadata card */
+.meta-card {
+  background: rgba(148, 163, 184, 0.05);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+/* Metadata card hover effect */
+.meta-card:hover {
+  background: rgba(148, 163, 184, 0.1);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+/* Success metadata card */
+.meta-card.success {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* Danger metadata card */
+.meta-card.danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Large icon inside metadata card */
+.meta-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+/* Metadata label */
+.meta-label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+/* Metadata value */
+.meta-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--slate-1);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Shared form grid setup */
+.kv,
+.field {
+  display: grid;
+  align-items: center;
+}
+
+/* Key-value style form layout */
+.kv {
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 10px 14px;
+}
+
+/* Standard field layout */
+.field {
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 8px 12px;
+  margin: 6px 0;
+}
+
+/* Form labels */
+.kv > label,
+.field > label {
+  font-weight: 600;
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+/* Text input styling */
+.kv input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-family: "JetBrains Mono", monospace;
+  transition: 0.2s;
+}
+
+/* Slightly dim readonly inputs */
+.kv input[readonly] {
+  opacity: 0.95;
+}
+
+/* Safe/valid input border */
+.kv input.ok {
+  border-color: rgba(34, 197, 94, 0.7);
+}
+
+/* Error/danger input border */
+.kv input.bad {
+  border-color: rgba(239, 68, 68, 0.7);
+}
+
+/* Small engine information box */
+.engine {
+  margin: 10px 0;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  background: rgba(21, 25, 52, 0.65);
+}
+
+/* Danger text style */
+.bad {
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+/* Safe text style */
+.ok {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* Selected file name text */
+#fileName {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--accent-cyan);
+    margin-top: 12px;
+}
+
+/* Medium-large screen adjustments */
+@media (max-width: 1200px) {
+  .nav-right a {
+    font-size: 1rem;
+  }
+
+  .scan-result-card {
+    padding: 32px;
+  }
+}
+
+/* Tablet layout changes */
 @media (max-width: 980px) {
-  main.wrap.grid { grid-template-columns: 1fr; }
+  main.wrap.grid {
+    grid-template-columns: 1fr;
+  }
+
+  body {
+    padding: calc(var(--nav-h) + 18px) 14px 50px;
+  }
+
+  .scan-result-card {
+    padding: 28px;
+  }
+
+  .result-title {
+    font-size: 28px;
+  }
 }
 
+/* Smaller tablet / large phone layout */
 @media (max-width: 768px) {
-  .scan-result-card { padding: 20px; }
-  .result-header { flex-direction: column; text-align: center; }
-  .result-title { font-size: 24px; }
-  .scan-meta-grid { grid-template-columns: 1fr; }
-  .view-toggle-container { flex-direction: column; }
-  .view-toggle-btn { width: 100%; justify-content: center; }
+  :root {
+    --nav-h: 120px;
+  }
+
+  body {
+    padding: calc(var(--nav-h) + 12px) 12px 40px;
+    gap: 16px;
+  }
+
+  .navbar {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .nav-right {
+    width: 100%;
+    gap: 12px;
+    justify-content: flex-start;
+  }
+
+  .nav-right a {
+    font-size: 0.95rem;
+  }
+
+  .logo {
+    font-size: 1.35rem;
+  }
+
+  .wrap {
+    width: min(100%, calc(100% - 16px));
+  }
+
+  .panel,
+  form#uploadForm,
+  .threat-alert,
+  .safe-summary,
+  .technical-panel,
+  .action-box {
+    padding: 18px;
+  }
+
+  form#uploadForm,
+  .row .btn,
+  .row button[type="submit"],
+  .btn,
+  button[type="submit"],
+  .view-toggle-btn {
+    width: 100%;
+  }
+
+  .dropzone {
+    padding: 28px 16px;
+  }
+
+  .dropzone > div:first-child {
+    font-size: 1rem;
+  }
+
+  .hint {
+    font-size: 0.85rem;
+  }
+
+  .row,
+  .view-toggle-container,
+  .result-header {
+    flex-direction: column;
+  }
+
+  .row {
+    align-items: stretch;
+  }
+
+  .result-header {
+    text-align: center;
+    gap: 16px;
+  }
+
+  .result-content {
+    text-align: center;
+  }
+
+  .result-title {
+    font-size: 24px;
+  }
+
+  .result-filename {
+    font-size: 14px;
+  }
+
+  .scan-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .view-toggle-btn {
+    justify-content: center;
+    border-radius: 8px;
+  }
+
+  .scan-result-card {
+    padding: 20px;
+  }
+
+  .scan-success {
+    align-items: flex-start;
+    font-size: 16px;
+  }
+
+  .threat-badge {
+    width: 100%;
+    text-align: center;
+  }
 }
 
-@media (max-width: 700px) {
-  .navbar { width: 94%; padding: 12px 14px; }
-  .nav-right a { margin-left: 12px; font-size: 0.82rem; }
-  h1 { font-size: 2.15rem; }
-  form#uploadForm { padding: 18px; }
-  .dropzone { padding: 28px 16px; }
+/* Small phone layout */
+@media (max-width: 560px) {
+  :root {
+    --nav-h: 132px;
+  }
+
+  body {
+    padding: calc(var(--nav-h) + 10px) 10px 32px;
+  }
+
+  .navbar {
+    padding: 10px 12px;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .nav-right {
+    gap: 10px;
+  }
+
+  .nav-right a {
+    font-size: 0.88rem;
+  }
+
+  .logout-btn {
+    padding: 7px 12px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  form#uploadForm,
+  .panel,
+  .dropzone,
+  .scan-result-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .dropzone > div:first-child {
+    font-size: 0.95rem;
+  }
+
+  .hint {
+    font-size: 0.8rem;
+  }
 
   .kv,
-  .field { grid-template-columns: 1fr; }
+  .field {
+    grid-template-columns: 1fr;
+  }
 
   .kv > label,
-  .field > label { text-align: left; }
+  .field > label {
+    text-align: left;
+  }
+
+  .result-title {
+    font-size: 20px;
+  }
+
+  .alert-title,
+  .technical-panel h3 {
+    font-size: 18px;
+  }
+
+  .alert-message,
+  .scan-info,
+  .action-box p,
+  .response-step-desc,
+  .meta-value {
+    font-size: 14px;
+  }
+
+  .meta-card {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .meta-icon {
+    font-size: 22px;
+  }
+
+  .bad {
+    font-size: 1.1rem;
+  }
+
+  .ok {
+    font-size: 1.05rem;
+  }
 }
 
+/* Very small phone layout */
+@media (max-width: 400px) {
+  :root {
+    --nav-h: 145px;
+  }
+
+  .nav-right a {
+    font-size: 0.82rem;
+  }
+
+  .logo {
+    font-size: 1.05rem;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  .view-toggle-btn {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+
+  .response-step {
+    gap: 0.65rem;
+  }
+
+  .response-step-number {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Turn off motion for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

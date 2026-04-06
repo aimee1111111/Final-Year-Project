@@ -1,10 +1,18 @@
+"""
+Main Flask backend for ThreatCheck
+
+This file runs the main Flask server for the project.
+It handles file uploads, scan history, common threat APIs, and also
+registers the forum and URL phishing blueprints. It connects the frontend
+to the scanning logic and database functions.
+"""
+
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from datetime import datetime, timezone
 import os
 import traceback
-import requests
-from urllib.parse import urlparse
+from dotenv import load_dotenv
 
 from scanning import scan_single_file
 from db import init_db_pool, save_scan_to_db, get_history
@@ -13,17 +21,28 @@ from commonvirus_db import (
     get_common_threats,
     get_threat_recent_scans,
 )
-from forum_routes import forum_bp 
+from forum_routes import forum_bp
+from url_backend_routes import phishing_bp
 
 app = Flask(__name__, static_folder=".", static_url_path="")
+
+# Allow frontend pages running on these local ports to call this backend
 CORS(
     app,
-    resources={r"/*": {"origins": ["http://localhost:4000","http://localhost:5001", "http://127.0.0.1:4000"]}},
+    resources={r"/*": {"origins": ["http://localhost:4000", "http://localhost:5001", "http://127.0.0.1:4000"]}},
 )
+
+# Register extra route groups from other files
 app.register_blueprint(forum_bp)
-app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50 MB
+app.register_blueprint(phishing_bp)
+
+# Limit uploaded file size to 50 MB
+app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
+
+load_dotenv()
 
 
+# Gets the user's real IP address, including when forwarded through a proxy
 def get_client_ip():
     forwarded = request.headers.get("X-Forwarded-For", "")
     if forwarded:
@@ -31,8 +50,9 @@ def get_client_ip():
     return request.remote_addr or ""
 
 
-# Init pools once (avoid double init under debug reloader)
+# Make sure database pools are only created once
 _pools_inited = False
+
 
 def init_pools_once():
     global _pools_inited
@@ -53,6 +73,7 @@ def init_pools_once():
         traceback.print_exc()
 
 
+# Simple health check route
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify(
@@ -64,11 +85,13 @@ def health():
     )
 
 
+# Default route serves the main file scanning page
 @app.route("/", methods=["GET"])
 def root():
     return send_from_directory(".", "files.html")
 
 
+# Upload route for scanning one or more files
 @app.route("/upload", methods=["POST"])
 def upload():
     user_id = request.form.get("user_id")
@@ -84,6 +107,7 @@ def upload():
     if not files:
         return jsonify({"safe": False, "message": "No files provided"}), 400
 
+    # Ignore empty filenames
     valid_files = [f for f in files if f.filename and f.filename.strip()]
     if not valid_files:
         return jsonify({"safe": False, "message": "No valid files provided"}), 400
@@ -91,7 +115,7 @@ def upload():
     source_ip = get_client_ip()
 
     try:
-        # Single
+        # Single file upload: return one scan result object
         if len(valid_files) == 1:
             scanned_at_dt = datetime.now(timezone.utc)
             result = scan_single_file(valid_files[0])
@@ -102,6 +126,8 @@ def upload():
             except Exception as db_e:
                 print(f"[DB] save_scan_to_db failed: {db_e}")
                 traceback.print_exc()
+
+                # Add DB error information into the scan results if saving fails
                 result.setdefault("scan_results", []).append(
                     {"engine": "DB", "status": "error", "error": str(db_e)}
                 )
@@ -113,7 +139,7 @@ def upload():
                 return jsonify(result), 500
             return jsonify(result)
 
-        # Multiple
+        # Multiple file upload: return a list of scan results
         results = []
         for f in valid_files:
             scanned_at_dt = datetime.now(timezone.utc)
@@ -140,6 +166,7 @@ def upload():
         return jsonify({"safe": False, "message": f"Upload failed: {e}"}), 500
 
 
+# Returns previous scan history for a user
 @app.route("/history", methods=["GET"])
 def history():
     user_id = request.args.get("user_id")
@@ -159,6 +186,7 @@ def history():
 
     rows = get_history(user_id_int, limit)
 
+    # Convert database rows into cleaner JSON for the frontend
     results = []
     for row in rows:
         results.append(
@@ -181,8 +209,7 @@ def history():
     return jsonify({"results": results})
 
 
-#Common virus APIs
-
+# Common threat list API
 @app.route("/api/common-viruses", methods=["GET"])
 def api_common_viruses():
     days = request.args.get("days", "30")
@@ -224,6 +251,7 @@ def api_common_viruses():
     return jsonify({"days": days_i, "min_count": min_count_i, "items": items})
 
 
+# Returns general information for a named threat
 @app.route("/api/virus", methods=["GET"])
 def api_virus_info():
     name = (request.args.get("name") or "").strip()
@@ -250,6 +278,7 @@ def api_virus_info():
     )
 
 
+# Returns recent scans related to one specific threat
 @app.route("/api/virus/scans", methods=["GET"])
 def api_virus_scans():
     name = (request.args.get("name") or "").strip()
@@ -283,87 +312,11 @@ def api_virus_scans():
         user_id=user_id_int,
         limit=limit_i,
     )
-    
 
     return jsonify({"name": name, "days": days_i, "items": items})
 
-@app.route("/api/phishstats", methods=["GET"])
-def api_phishstats():
-    url = (request.args.get("url") or "").strip()
-    if not url:
-        return jsonify({
-            "service": "PhishStats",
-            "error": True,
-            "details": "missing url"
-        }), 400
 
-    try:
-        parsed = urlparse(url)
-        host = parsed.netloc.lower().strip()
-
-        if not host:
-            return jsonify({
-                "service": "PhishStats",
-                "error": True,
-                "details": "invalid url"
-            })
-
-        # Keep this lightweight: search by hostname only
-        resp = requests.get(
-            "https://api.phishstats.info/api/phishing",
-            params={
-                "_where": f"(url,like,{host})",
-                "_sort": "-date",
-                "_size": 5,
-            },
-            headers={
-                "Accept": "application/json",
-                "User-Agent": "ThreatCheck/1.0",
-            },
-            timeout=4,
-        )
-
-        if resp.status_code != 200:
-            return jsonify({
-                "service": "PhishStats",
-                "error": True,
-                "details": f"HTTP {resp.status_code}"
-            })
-
-        data = resp.json()
-        found = isinstance(data, list) and len(data) > 0
-
-        return jsonify({
-            "service": "PhishStats",
-            "safe": not found,
-            "disposition": "phishing" if found else "clean",
-            "brand": data[0].get("title", "N/A") if found else "N/A",
-            "resolved": found,
-            "records": data[:5] if found else []
-        })
-
-    except requests.exceptions.Timeout:
-        return jsonify({
-            "service": "PhishStats",
-            "error": True,
-            "details": "Service timed out"
-        })
-
-    except requests.exceptions.RequestException as e:
-        return jsonify({
-            "service": "PhishStats",
-            "error": True,
-            "details": f"Request failed: {str(e)}"
-        })
-
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({
-            "service": "PhishStats",
-            "error": True,
-            "details": str(e)
-        })
-
+# Start the Flask app
 if __name__ == "__main__":
     init_pools_once()
     app.run(host="0.0.0.0", port=5000, debug=True)

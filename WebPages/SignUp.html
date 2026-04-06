@@ -1,25 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- character encoding -->
     <meta charset="UTF-8">
+
+    <!-- makes the page responsive on mobile/tablet -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- title shown in browser tab -->
     <title>Sign Up</title>
+
+    <!-- links the external CSS file -->
     <link rel="stylesheet" href="SignUp.css">
 </head>
 <body>
+
+    <!-- main sign up container -->
     <div class="container">
+        <!-- page heading -->
         <h2>Sign Up</h2>
+
+        <!-- sign up form -->
         <form id="signupForm">
+            <!-- username input -->
             <input type="text" name="username" placeholder="Username" required>
+
+            <!-- email input -->
             <input type="email" name="email" placeholder="Email" required>
+
+            <!-- password input -->
             <input type="password" name="password" placeholder="Password" required>
+
+            <!-- submit button -->
             <button type="submit">Sign Up</button>
         </form>
         
+        <!-- hidden error message shown if signup fails -->
         <p id="error-message" style="color:red; display:none;"></p>
+
+        <!-- link to login page for existing users -->
         <p>Already have an account? <a href="/login.html">Login</a></p>
     </div>
     
+    <!-- links JavaScript file for signup functionality -->
     <script src="FrontEndSignUp.js"></script>
 </body>
 </html>
