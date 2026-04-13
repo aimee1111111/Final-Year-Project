@@ -569,7 +569,7 @@ button[type="submit"]:hover {
 
 /* Scanned filename text */
 .result-filename {
-  font-size: 16px;
+  font-size: 20px;
   color: var(--muted);
   margin: 0;
   word-break: break-word;
@@ -659,7 +659,7 @@ button[type="submit"]:hover {
 .scan-info,
 .action-box p,
 .response-step-desc {
-  font-size: 16px;
+  font-size: 25px;
   color: var(--slate-2);
   margin: 0 0 20px;
   line-height: 1.6;
@@ -686,7 +686,7 @@ button[type="submit"]:hover {
 .threat-details h4,
 .action-box h4,
 .technical-panel h4 {
-  font-size: 16px;
+  font-size: 25px;
   font-weight: 600;
   color: var(--slate-1);
   margin: 0 0 12px;
@@ -811,7 +811,7 @@ button[type="submit"]:hover {
 
 /* Step title text */
 .response-step-title {
-  font-size: 0.96rem;
+  font-size: 1.46rem;
   font-weight: 700;
   line-height: 1.4;
   color: #ffe4de;
@@ -872,7 +872,7 @@ button[type="submit"]:hover {
 
 /* Metadata value */
 .meta-value {
-  font-size: 16px;
+  font-size: 25px;
   font-weight: 600;
   color: var(--slate-1);
   word-break: break-word;
@@ -903,9 +903,17 @@ button[type="submit"]:hover {
 .kv > label,
 .field > label {
   font-weight: 600;
+    font-size: 1.6rem;
   text-align: right;
   color: var(--text-secondary);
 }
+
+.engine,
+.engine * {
+  font-size: 1.45rem;
+  line-height: 1.6;
+}
+
 
 /* Text input styling */
 .kv input[type="text"] {
@@ -917,6 +925,7 @@ button[type="submit"]:hover {
   color: var(--text-primary);
   font-family: "JetBrains Mono", monospace;
   transition: 0.2s;
+  font-size: 1.6rem;
 }
 
 /* Slightly dim readonly inputs */
@@ -1176,8 +1185,9 @@ button[type="submit"]:hover {
 
   .alert-title,
   .technical-panel h3 {
-    font-size: 18px;
+    font-size: 25px;
   }
+  
 
   .alert-message,
   .scan-info,

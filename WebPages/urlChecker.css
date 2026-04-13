@@ -25,7 +25,7 @@
 /* label above the URL input */
 .url-input-box label {
     display: block;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     color: var(--accent-cyan);
     margin-bottom: 1rem;
     font-weight: 600;
@@ -51,7 +51,7 @@
     border-radius: 8px;
     color: var(--text-primary);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.95rem;
+    font-size: 1.25rem;
     outline: none;
     transition: all 0.3s ease;
 }
@@ -108,7 +108,7 @@
     background: rgba(0, 245, 255, 0.1);
     border-radius: 8px;
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: 1.25rem;
 }
 
 /* wrapper around URL checker results */
@@ -204,7 +204,7 @@
 
 /* main verdict title */
 .uc-card__title {
-    font-size: 26px;
+    font-size: 36px;
     font-weight: 700;
     font-family: 'Syne', sans-serif;
     margin: 0 0 4px 0;
@@ -225,7 +225,7 @@
 
 /* scanned URL text */
 .uc-card__url {
-    font-size: 13px;
+    font-size: 20px;
     color: #94a3b8;
     word-break: break-all;
 }
@@ -255,7 +255,7 @@
 
 /* title in alert box */
 .uc-alert__title {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 600;
     margin: 0 0 10px 0;
 }
@@ -289,7 +289,7 @@
 
 /* small threat heading label */
 .uc-threat-label {
-    font-size: 13px;
+    font-size: 16px;
     color: #94a3b8;
     margin-bottom: 8px;
     text-transform: uppercase;
@@ -311,7 +311,7 @@
     color: #fca5a5;
     padding: 6px 14px;
     border-radius: 20px;
-    font-size: 13px;
+    font-size: 16px;
 }
 
 /* action/recommendation box */
@@ -350,7 +350,7 @@
 .uc-action-box__text {
     color: #cbd5e1;
     margin: 0;
-    font-size: 14px;
+    font-size: 10px;
     line-height: 1.6;
 }
 
@@ -367,7 +367,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     color: #10b981;
     margin-bottom: 10px;
@@ -413,7 +413,7 @@
 
 /* metadata value text */
 .uc-meta-card__value {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     color: #e2e8f0;
 }
@@ -448,7 +448,7 @@
 
 /* label for URL */
 .uc-tech-url-label {
-    font-size: 13px;
+    font-size: 16px;
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -457,7 +457,7 @@
 
 /* actual URL text */
 .uc-tech-url-value {
-    font-size: 14px;
+    font-size: 18px;
     color: #94a3b8;
     word-break: break-all;
 }
@@ -475,7 +475,7 @@
 /* label inside technical stats */
 .uc-tech-stat__label {
     color: #64748b;
-    font-size: 12px;
+    font-size: 16px;
     display: block;
     margin-bottom: 3px;
 }
@@ -483,6 +483,7 @@
 /* stat value */
 .uc-tech-stat__value {
     color: #e2e8f0;
+    font-size: 18px;
 }
 
 /* stat colour variants */
@@ -531,7 +532,7 @@
 /* service name */
 .uc-service__name {
     font-weight: 700;
-    font-size: 15px;
+    font-size: 18px;
 }
 
 /* service name colour variants */
@@ -549,7 +550,7 @@
 
 /* small badge beside service name */
 .uc-service__badge {
-    font-size: 12px;
+    font-size: 14px;
     padding: 3px 10px;
     border-radius: 20px;
     border: 1px solid transparent;
@@ -584,7 +585,7 @@
 .uc-service__table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 20px;
 }
 
 /* row divider in table */
