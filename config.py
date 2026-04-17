@@ -29,7 +29,51 @@ PHISH_KEYWORDS = [
     "suspicious activity", "customs fee", "package on hold", "tax refund",
     "wire transfer", "bank transfer", "crypto", "bitcoin", "ransomware", "phishing",
     "approve login", "access suspended", "password reset request", "verify card",
-    "limited offer", "offer expires", "low balance", "credit limit", "invoice attached"
+    "limited offer", "offer expires", "low balance", "credit limit", "invoice attached",
+
+    # urgency / pressure
+    "immediate action required", "respond immediately", "within 24 hours",
+    "within 12 hours", "last warning", "final warning", "act immediately",
+    "time sensitive", "do not ignore", "urgent response needed",
+
+    # account / security
+    "confirm your identity", "verify your identity", "account verification",
+    "security check", "account restriction", "account limitation",
+    "login attempt detected", "multiple login attempts",
+    "unrecognized device", "new device login", "secure your account",
+    "account compromised", "security breach",
+
+    # credentials / sensitive info
+    "enter your password", "confirm your details", "update your details",
+    "provide your information", "verify your information",
+    "confirm billing details", "update payment information",
+    "verify payment details", "submit your credentials",
+
+    # financial / threats
+    "account will be closed", "account will be terminated",
+    "service interruption", "payment declined", "transaction failed",
+    "refund available", "claim your refund", "pending payment",
+    "outstanding balance", "overdue payment",
+
+    # delivery / scams
+    "delivery failed", "missed delivery", "reschedule delivery",
+    "track your package", "shipment delayed", "parcel held",
+    "customs clearance required",
+
+    # generic bait / rewards
+    "you have won", "claim your prize", "exclusive deal",
+    "special promotion", "free gift", "reward waiting",
+    "loyalty reward", "bonus offer",
+
+    # authority impersonation
+    "bank notice", "government notice", "official notice",
+    "irs notice", "tax authority", "legal action",
+    "compliance required",
+
+    # attachments / links
+    "download attachment", "open attachment", "view document",
+    "secure link", "click here", "follow the link",
+    "access document", "review document"
 ]
 
 # Brand, finance, and service-related words often seen in phishing messages

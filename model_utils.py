@@ -255,52 +255,150 @@ def build_or_load_model(force: bool = False) -> VotingClassifier:
             print(f"Model load error, retraining: {e}", file=sys.stderr)
 
     # Built-in phishing examples used to bootstrap the model
-    phish = [
-        "Urgent action required: your [BRAND] account will be suspended. Verify now.",
-        "Security alert: unusual activity on your [SERVICE] account. Click to restore.",
-        "Payment failed for [BRAND], update billing to avoid interruption.",
-        "Your package is on hold. Pay customs fee: http://bit.ly/xyz",
-        "Confirm your identity to receive prize. Fill form immediately.",
-        "We detected 2FA disabled on [SERVICE]. Re-validate now.",
-        "Invoice attached. Please enable macros to view.",
-        "Your [BRAND] account is restricted. Login to reactivate.",
-        "Final notice: mailbox storage full. Verify to continue.",
-        "[SERVICE] withdrawal request. If this wasn't you, cancel here.",
-        "Unusual login detected on your [BRAND] account. Verify your password now.",
-        "Payment to [SERVICE] could not be processed. Update billing immediately.",
-        "Account suspended due to suspicious activity. Click to verify identity.",
-        "Your [BRAND] will be locked within 24 hours. Reset password now.",
-        "Unrecognized device signed into [SERVICE]. V3rify your account now.",
-        "Recent payment declined. Update card details to avoid service interruption.",
-        "Delivery failure: parcel being returned. Pay customs here.",
-        "You've won a $500 gift card! Claim prize now.",
-        "Confirm payment of £129.99 to [BRAND]. Click to dispute.",
-        "System upgrade: all users must reset passwords or lose access.",
-        "Refund issued. Open attached invoice and enable macros to accept.",
-        "Tax authority requires verification for refund. Provide documents here.",
-        "Account compromise detected. Provide one-time code to re-enable.",
-        "Subscription renewal failed. Update billing or [SERVICE] will be cancelled."
-    ]
+    phish += [
+    # more urgency / account threats
+    "Immediate verification required or your [BRAND] account will be deleted.",
+    "We were unable to verify your details. Confirm now to avoid suspension.",
+    "Your session has expired. Login again to continue using [SERVICE].",
+    "Too many failed login attempts. Reset your password immediately.",
+    "Critical alert: your account is at risk. Secure it now.",
+
+    # more payment / billing
+    "Your subscription to [SERVICE] has expired. Renew now to avoid disruption.",
+    "Payment declined for your recent order. Update your card details.",
+    "Outstanding balance detected. Pay now to avoid penalties.",
+    "Auto-payment failed. Re-enter billing information immediately.",
+    "Confirm your payment details to avoid late fees.",
+
+    # delivery / logistics scams
+    "Your parcel is waiting for collection. Pay small fee to release.",
+    "Delivery attempt failed. Reschedule here: http://tinyurl.com/abc",
+    "Package held at depot. Confirm address and pay shipping fee.",
+    "We could not deliver your item. Update delivery info now.",
+    "Shipment requires signature confirmation. Click to proceed.",
+
+    # rewards / bait
+    "Congratulations! You’ve been selected for an exclusive reward.",
+    "You are eligible for a compensation payment. Claim now.",
+    "Limited time reward available. Confirm your details to receive.",
+    "You have unclaimed funds waiting. Verify to access.",
+    "Exclusive offer just for you. Act now before it expires.",
+
+    # impersonation (more realistic)
+    "Your Netflix account has been suspended. Update payment to continue watching.",
+    "Apple ID locked due to suspicious activity. Verify immediately.",
+    "Your PayPal account is limited. Resolve now to restore access.",
+    "Amazon: problem with your recent order. Confirm your details.",
+    "Microsoft account security alert. Review activity now.",
+
+    # work / internal phishing (very realistic)
+    "HR: Please review updated company policy document attached.",
+    "IT Support: Your password expires today. Reset here.",
+    "Shared document from [SERVICE]. Click to view securely.",
+    "New voicemail received. Listen to message here.",
+    "You have a secure message waiting. Access now.",
+
+    # attachments / malware-style
+    "Important document attached. Enable editing to view contents.",
+    "Scanned invoice attached. Open file to review.",
+    "Confidential report. Download and enable macros.",
+    "Voicemail attachment received. Open to listen.",
+    "Encrypted message. Download attachment to decrypt.",
+
+    # slightly obfuscated / trickier
+    "Verify your acc0unt now to avoid suspensi0n.",
+    "C0nfirm your det@ils to restore access.",
+    "Unusual activity detected. V3rify immediately.",
+    "Reset your passw0rd using the secure link.",
+    "Click h3re to update your inf0rmation.",
+
+    # social engineering / fear tactics
+    "Legal notice: failure to respond may result in account closure.",
+    "We have reported suspicious activity linked to your account.",
+    "Failure to comply may result in permanent data loss.",
+    "Your account is under investigation. Confirm identity now.",
+    "Security team requires immediate verification from you.",
+
+    # OTP / MFA abuse
+    "Your verification code is required to restore access.",
+    "Enter the code sent to your phone to confirm identity.",
+    "We sent you a security code. Provide it to continue.",
+    "2FA verification failed. Re-enter your code now.",
+    "Confirm your login using the one-time passcode."
+]
 
     # Built-in legitimate examples used to balance the dataset
-    legit = [
-        "Meeting moved to 2pm tomorrow, see updated agenda.",
-        "Thanks for your purchase. Your order has shipped.",
-        "Quarterly newsletter: new features and improvements.",
-        "Team offsite details and FAQs inside.",
-        "Your password was changed successfully.",
-        "Project update: sprint review notes and next steps.",
-        "Invoice for services rendered in September.",
-        "Reminder: appointment on Friday at 9:00 AM.",
-        "Welcome to the course! Here are your materials.",
-        "Board minutes from last week are available.",
-        "Your subscription renewal receipt attached. No action required.",
-        "Delivery scheduled: parcel arrives Thursday between 9-5.",
-        "Security alert: login from recognized device in Dublin.",
-        "Your event registration is confirmed. See you there!",
-        "Monthly statement available in your account portal.",
-        "Thank you for attending today's webinar."
-    ]
+    legit += [
+    # general workplace / normal comms
+    "Can you review the document and send feedback by EOD?",
+    "Here are the notes from today’s meeting.",
+    "Please see the attached report for your reference.",
+    "Let me know if you have any questions.",
+    "Following up on the email I sent earlier this week.",
+    "Quick reminder about the deadline tomorrow.",
+    "Updated version of the file is now available.",
+    "Thanks again for your help on this.",
+    "We’ll discuss this further in tomorrow’s call.",
+    "Agenda for next week’s meeting attached.",
+
+    # account / service (legit but similar tone to phishing)
+    "We noticed a login to your account from a new device. If this was you, no action is needed.",
+    "Your password has been updated successfully.",
+    "A new device was used to access your account.",
+    "You recently signed in on a new browser.",
+    "Your account settings were updated.",
+    "Security notice: we recommend reviewing your recent activity.",
+    "You can manage your account settings anytime in your profile.",
+
+    # payments / receipts (legit)
+    "Your payment has been processed successfully.",
+    "Receipt for your recent transaction is attached.",
+    "Thank you for your payment.",
+    "Your order confirmation is included below.",
+    "We’ve received your payment and your order is being prepared.",
+    "Invoice attached for your records.",
+    "Payment confirmation for your subscription renewal.",
+
+    # delivery / logistics (legit)
+    "Your package has been dispatched and is on its way.",
+    "Tracking information for your delivery is included below.",
+    "Your order will arrive within 3–5 business days.",
+    "Delivery completed successfully.",
+    "Your parcel has been delivered to your address.",
+    "Courier has picked up your package.",
+
+    # events / bookings
+    "Your booking has been confirmed.",
+    "Here are your tickets for the event.",
+    "Reminder: your reservation is tomorrow evening.",
+    "Your check-in details are included below.",
+    "We look forward to seeing you at the event.",
+    "Your registration details are attached.",
+
+    # casual / human tone (important for realism)
+    "Hey, just checking in about this.",
+    "No rush on this, just when you get a chance.",
+    "Thanks, that worked perfectly.",
+    "Got it, I’ll take a look later today.",
+    "Let’s catch up tomorrow.",
+    "Sounds good to me.",
+
+    # slightly “trigger-like” but still legit (important for testing false positives)
+    "Click here to view your invoice in your account portal.",
+    "Download your receipt from the link below.",
+    "Please log in to your account to view your statement.",
+    "Access your dashboard to see the latest updates.",
+    "Follow this link to review your subscription details.",
+    "Open the document in your account to view more details.",
+
+    # system / automated but safe
+    "System update completed successfully.",
+    "Your request has been processed.",
+    "No further action is required at this time.",
+    "This is an automated message confirming your request.",
+    "Backup completed successfully.",
+    "Your data has been synced."
+]
 
     # Brand names used to generate more varied synthetic examples
     brands = [

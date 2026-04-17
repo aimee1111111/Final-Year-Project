@@ -81,65 +81,100 @@ body::after {
   to { transform: translate(50px, 50px); }
 }
 
-/* Navbar */
+/* nav */
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-  padding: 14px 28px;
-  background: rgba(21, 25, 52, 0.7);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-soft);
-  z-index: 1000;
-  box-shadow: var(--shadow-soft);
+    padding: 14px 28px;
+    background: rgba(21, 25, 52, 0.7);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-soft);
+
+    z-index: 1000;
+    box-shadow: var(--shadow-soft);
+    min-height: var(--nav-h);
 }
 
-/* site logo text */
+/* site logo styling */
 .logo {
-  font-family: "Syne", sans-serif;
-  font-size: 1.4rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+    margin: 0;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+
+    /* gradient text effect */
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
 }
 
-/* right side nav links */
+/* right side of navbar for nav links */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* navbar link styling */
 .nav-right a {
-  margin-left: 20px;
-  text-decoration: none;
-  color: var(--text-secondary);
-  font-weight: 500;
-  transition: color 0.25s ease;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 1.4rem;
+    position: relative;
+    transition: color 0.25s ease;
+    margin-left: 0;
 }
 
-/* nav hover effect */
+/* animated underline under links */
+.nav-right a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0;
+    height: 2px;
+    background: var(--accent-cyan);
+    transition: width 0.25s ease;
+}
+
+/* link hover colour */
 .nav-right a:hover {
-  color: var(--text-primary);
+    color: var(--text-primary);
 }
 
-/* logout button styling */
+/* underline expands on hover */
+.nav-right a:hover::after {
+    width: 100%;
+}
+
+/* special logout button styling */
 .logout-btn {
-  background: transparent;
-  border: 1px solid var(--accent-magenta);
-  color: var(--accent-magenta) !important;
-  padding: 8px 15px;
-  border-radius: 8px;
-  transition: all 0.25s ease;
+    background: transparent;
+    border: 1px solid var(--accent-magenta);
+    color: var(--accent-magenta) !important;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: all 0.25s ease;
 }
 
-/* logout button hover */
+/* logout button hover effect */
 .logout-btn:hover {
-  background: var(--accent-magenta);
-  color: #fff !important;
-  box-shadow: 0 0 18px rgba(255, 0, 110, 0.45);
+    background: var(--accent-magenta);
+    color: #fff !important;
+    box-shadow: 0 0 18px rgba(255, 0, 110, 0.45);
 }
 
 /* Layout */
